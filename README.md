@@ -34,7 +34,9 @@ costs one extra file per page.
     npm run serve      # → http://localhost:8080
     npm run dev        # both
 
-    npm test           # 46 tests, no network, no browser
+    npm preview        # all three themes side by side
+
+    npm test           # 53 tests, no network, no browser
 
 Node 22+. One runtime dependency — `marked`, for Markdown — because
 hand-rolling a Markdown parser would be the exact error the commons rejects
@@ -52,7 +54,7 @@ elsewhere.
 | `sitemap.xml` | Search engines. Canonical HTML URLs only — never the Markdown twins. |
 | `feed.xml` | Atom, with the full text of each post in the entry. |
 | `robots.txt` | The crawl policy, with the major AI crawlers **named and allowed**. |
-| `theme.css`, `styles.css` | The design theme, and the components built on it. |
+| `base.css`, `themes/*.css` | The structural layer, and the interchangeable design themes. |
 | `favicon.svg` | Self-contained, with its own dark-mode rule. |
 
 ## Layout
@@ -63,13 +65,14 @@ elsewhere.
       products/          one file per product
       blog/              YYYY-MM-DD-slug.md — the date prefix is not in the URL
     assets/
-      theme.css          the design theme: tokens only, no components
-      styles.css         the component layer, built entirely on those tokens
+      base.css           structure only: no colour, font or size of its own
+      themes/            one file per design theme: tokens plus components
     src/
       build.ts           the one pass that produces both renderings
       content.ts         loading and validating content
       frontmatter.ts     a strict, tiny YAML subset that never guesses
       markdown.ts        Markdown → HTML, headings, plain text
+      themes.ts          the theme registry
       render/            layout, page templates, the SVG art system, shortcodes
       seo/               <head> metadata and JSON-LD
       emit/              sitemap, robots, feed, llms.txt, index.json, twins
@@ -110,24 +113,50 @@ so re-theming redraws every illustration on the site at once. The figures are
 Product front matter adds `compareTo`, `status`, `repo` and `limitation`; the
 limitation is rendered **above** the features, on purpose.
 
-## The design theme
+## The design themes
 
-`assets/theme.css` is the theme — **Field** — and it is tokens only: colour,
-type, space, line, motion. No components, no layout. Another Pumasi product can
-link or copy it and inherit the look without inheriting this website's
-furniture.
+The site is themed in two layers:
 
-It is documented, and rendered live, at [`/design/`](https://pumasi.ai/design/).
+- **`assets/base.css`** — structure, layout, landmarks, accessibility, print.
+  It holds **no colour, no font and no size of its own**; every visual decision
+  is a token it reads.
+- **`assets/themes/<id>.css`** — the tokens, plus the components built on them.
 
-Two rules for anyone extending it. **Never write a literal colour outside
-`theme.css`** — add a token instead; `styles.css` contains none. And **no web
-fonts**: a font request is a third-party request, a blocking paint and a layout
-shift, in exchange for a typeface nobody notices.
+Swapping the theme file swaps the design without touching a line of markup.
+Three are in the repository:
+
+| Theme | Direction | Drawn from |
+|---|---|---|
+| **`signal`** | High-contrast and engineered. Near-black on white, one blue that only ever means "interactive", headlines at −0.045em, and a great deal of space. | Vercel · Linear · Stripe |
+| **`console`** | Monospace everywhere. Square corners, visible borders, console punctuation. The site looks like the machine-readable artefact it is. | Bun · Raycast · Resend |
+| **`press`** | Editorial and structural. Type at hero scale, numbered sections under thick rules, one signal red. | 2026 brutalist-editorial · Swiss print |
+
+Compare them side by side, same content and markup in all three:
+
+    npm run preview     # → :8081 :8082 :8083, with a switcher bar
+
+Build a specific one:
+
+    PUMASI_THEME=console npm run build
+
+Two rules for anyone extending a theme. **Never write a literal colour outside
+a theme file** — `base.css` contains none, and a test enforces it. And every
+theme supplies the **same token vocabulary**: `--accent`, never `--clay`. A
+token named for what it looks like has to be renamed when the look changes,
+which is how a theme layer stops being one.
+
+**No web fonts, in any theme.** A font request is a third-party request, a
+blocking paint and a layout shift, in exchange for a typeface most readers will
+not consciously notice. That is a decision, not a law: self-hosting one display
+face would be a single file and one token change.
 
 Illustrations are SVG generated at build time and inlined, so one drawing is
-correct in light and dark, costs no request at any size, and is seeded from the
-page's own address — every product and post gets its own picture, identical in
-every build.
+correct in light and dark **and in every theme**, costs no request at any size,
+and is seeded from the page's own address. Each theme supplies a corner radius
+and an art style, so the drawings share a vocabulary without sharing a
+personality.
+
+The tokens in use are documented and rendered live at `/design/`.
 
 ## Deploying
 

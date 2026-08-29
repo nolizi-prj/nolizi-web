@@ -16,6 +16,7 @@
 
 import { escapeHtml } from "../html.js";
 import { logoMark } from "./art.js";
+import type { Theme } from "../themes.js";
 import { renderMeta, type MetaInput } from "../seo/meta.js";
 import type { SiteConfig } from "../types.js";
 
@@ -24,6 +25,10 @@ export interface LayoutInput extends MetaInput {
   main: string;
   /** Extra class on `<body>`, for page-specific styling. */
   bodyClass?: string;
+  /** Which design theme this build is rendering. */
+  theme: Theme;
+  /** Review-only chrome for comparing themes. Absent in a real build. */
+  previewBar?: string;
 }
 
 export function renderLayout(input: LayoutInput): string {
@@ -35,17 +40,18 @@ export function renderLayout(input: LayoutInput): string {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
     ${renderMeta(input)}
-    <!-- Tokens first, then components. theme.css is standalone on purpose:
-         another Pumasi product can link it alone and inherit the palette,
-         the type scale and the spacing without this website's layout. -->
-    <link rel="stylesheet" href="/theme.css">
-    <link rel="stylesheet" href="/styles.css">
+    <!-- The theme first, then the shared structural layer that reads its
+         tokens. base.css holds no colour, font or size of its own, so
+         swapping the theme file swaps the design. -->
+    <link rel="stylesheet" href="/themes/${escapeHtml(input.theme.id)}.css">
+    <link rel="stylesheet" href="/base.css">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   </head>
   <body${input.bodyClass ? ` class="${escapeHtml(input.bodyClass)}"` : ""}>
+    ${input.previewBar ?? ""}
     <a class="skip" href="#main">Skip to content</a>
-    ${renderHeader(site, input.urlPath)}
+    ${renderHeader(site, input.urlPath, input.theme)}
     <main id="main">
 ${input.main}
     </main>
@@ -55,7 +61,7 @@ ${input.main}
 `;
 }
 
-function renderHeader(site: SiteConfig, current: string): string {
+function renderHeader(site: SiteConfig, current: string, theme: Theme): string {
   const links = site.nav
     .map((item) => {
       const active = current === item.href || (item.href !== "/" && current.startsWith(item.href));
@@ -66,7 +72,7 @@ function renderHeader(site: SiteConfig, current: string): string {
   return `<header class="masthead">
       <div class="wrap masthead-inner">
         <a class="wordmark" href="/">
-          ${logoMark()}
+          ${logoMark(theme.art)}
           <span class="wordmark-name">${escapeHtml(site.name)}</span>
           <span class="wordmark-tagline">${escapeHtml(site.tagline)}</span>
         </a>

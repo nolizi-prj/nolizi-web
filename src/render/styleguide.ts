@@ -19,19 +19,19 @@ const COLOUR_GROUPS: Array<{ title: string; note: string; tokens: string[] }> = 
     ],
   },
   {
-    title: "Clay — the one accent",
-    note: "Links, the primary action, and exactly one emphasis per view. One accent means the clay-coloured thing is always the thing to do next.",
-    tokens: ["--clay", "--clay-strong", "--clay-soft", "--clay-line"],
+    title: "Accent — the one colour",
+    note: "Links, the primary action, and exactly one emphasis per view. One accent is a constraint, not a shortage: it means the accented thing is always the thing to do next.",
+    tokens: ["--accent", "--accent-strong", "--accent-soft", "--accent-line", "--accent-contrast"],
   },
   {
-    title: "Wheat — in progress",
-    note: "Anything provisional: a limitation, a warning, a maturity that is not yet stable.",
-    tokens: ["--wheat", "--wheat-soft", "--wheat-line"],
+    title: "Warn — in progress",
+    note: "Anything provisional: a limitation, a caution, a maturity that is not yet stable.",
+    tokens: ["--warn", "--warn-soft", "--warn-line"],
   },
   {
-    title: "Sage — settled",
+    title: "OK — settled",
     note: "Anything verified: a passing gate, a stable release, a machine affordance that works.",
-    tokens: ["--sage", "--sage-soft", "--sage-line"],
+    tokens: ["--ok", "--ok-soft", "--ok-line"],
   },
   {
     title: "Illustration",
@@ -135,17 +135,20 @@ ${colours}
         </p>
 
         <h3>Callouts</h3>
-        <div class="callout callout-warn"><strong>Wheat — in progress.</strong> Used for a limitation a reader must know before adopting something.</div>
-        <div class="callout callout-good" style="margin-top: var(--space-2xs)"><strong>Sage — settled.</strong> Used for something verified: a gate passed, a claim checked.</div>
-        <div class="callout callout-note" style="margin-top: var(--space-2xs)"><strong>Clay — attention.</strong> Used sparingly, and never twice on one screen.</div>
+        <div class="callout callout-warn"><strong>Warn — in progress.</strong> Used for a limitation a reader must know before adopting something.</div>
+        <div class="callout callout-good" style="margin-top: var(--space-2xs)"><strong>OK — settled.</strong> Used for something verified: a gate passed, a claim checked.</div>
+        <div class="callout callout-note" style="margin-top: var(--space-2xs)"><strong>Accent — attention.</strong> Used sparingly, and never twice on one screen.</div>
 
         <h2 id="reuse">Taking the theme</h2>
         <p>
-          <code>theme.css</code> is tokens only and defines no components, so
-          another Pumasi product can link it and inherit the palette, the type
-          scale and the spacing without inheriting this website's layout:
+          Every theme file supplies the same token vocabulary — <code>--accent</code>,
+          never <code>--clay</code>. A token named for what it looks like has to
+          be renamed when the look changes, which is how a theme layer stops
+          being one. Because the names are stable, another Pumasi product can
+          link a theme and inherit the palette, the type scale and the spacing
+          without inheriting this website's layout:
         </p>
-        <pre tabindex="0"><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;https://pumasi.ai/theme.css&quot;&gt;</code></pre>
+        <pre tabindex="0"><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;https://pumasi.ai/themes/signal.css&quot;&gt;</code></pre>
         <p>
           Or copy the file. It is Apache-2.0, it has no dependencies, and it is
           under three hundred lines. Copying it is the expected thing to do —

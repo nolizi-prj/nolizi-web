@@ -20,9 +20,9 @@ export class ShortcodeError extends Error {}
 
 const PATTERN = /<p>\s*\{\{figure:([a-z0-9-]+)(?::([a-z0-9-]+))?(?:\|([^}]*))?\}\}\s*<\/p>/gi;
 
-export function expandShortcodes(html: string, context: string): string {
+export function expandShortcodes(html: string, context: string, radius: number): string {
   return html.replace(PATTERN, (_match, name: string, arg: string | undefined, caption: string | undefined) => {
-    const art = draw(name.toLowerCase(), arg, context);
+    const art = draw(name.toLowerCase(), arg, context, radius);
     // The caption is NOT escaped here: this pattern runs against HTML that
     // marked has already rendered and escaped. Escaping it a second time is
     // how "page's" becomes "page&amp;#39;s" on the page.
@@ -33,14 +33,14 @@ export function expandShortcodes(html: string, context: string): string {
   });
 }
 
-function draw(name: string, arg: string | undefined, context: string): string {
+function draw(name: string, arg: string | undefined, context: string, radius: number): string {
   switch (name) {
     case "merge-gate":
-      return mergeGateArt();
+      return mergeGateArt(radius ? 26 : 0);
     case "plot":
-      return plotArt(arg ?? context, 900, 300, 0.55);
+      return plotArt(arg ?? context, 900, 300, 0.55, radius);
     case "cover":
-      return coverArt(arg ?? context, 1000, 300);
+      return coverArt(arg ?? context, 1000, 300, radius ? 3 : 0);
     default:
       throw new ShortcodeError(
         `${context}: unknown figure "${name}". Known figures: merge-gate, plot, cover.`,

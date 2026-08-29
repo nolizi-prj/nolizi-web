@@ -1,0 +1,302 @@
+/*
+ * Pumasi — base layer.
+ *
+ * Structure, layout and accessibility, shared by every theme. It holds not one
+ * colour value, not one font name and not one size: every visual decision is a
+ * token that a theme file supplies. Swapping the theme file swaps the design.
+ *
+ * The token vocabulary is deliberately the SAME across themes — `--accent`,
+ * not `--clay`. A token named for what it looks like has to be renamed when the
+ * look changes, which is how a theme layer stops being one.
+ *
+ * Load order matters: a theme file first, then this.
+ *
+ * Licence: Apache-2.0.
+ */
+
+/* ===================================================================
+ * Reset
+ * =================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--space-lg);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--ink-strong);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-display);
+  margin: 0;
+  text-wrap: balance;
+}
+
+p, ul, ol, dl, blockquote, pre, table, figure { margin: 0; }
+img, svg, video { max-width: 100%; height: auto; display: block; }
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+a:hover { color: var(--accent-strong); }
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+code, pre, kbd, samp { font-family: var(--font-mono); font-size: 0.9em; }
+hr { border: 0; border-top: var(--border); margin: var(--space-lg) 0; }
+::selection { background: var(--accent-soft); color: var(--ink-strong); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===================================================================
+ * Layout skeleton
+ * =================================================================== */
+
+.wrap {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-sm);
+  top: calc(-1 * var(--space-3xl));
+  z-index: 10;
+  padding: var(--space-2xs) var(--space-sm);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  text-decoration: none;
+  transition: top var(--duration) var(--ease);
+}
+.skip:focus { top: var(--space-sm); color: var(--accent-contrast); }
+
+main { display: block; padding-block: var(--space-lg) var(--space-2xl); }
+.section { margin-block: var(--space-xl); }
+
+/* ===================================================================
+ * Masthead — mobile first. The whole navigation is always visible; on a
+ * phone it scrolls sideways in its own strip rather than hiding behind a
+ * button, because a menu that needs JavaScript to open does not open for a
+ * crawler either.
+ * =================================================================== */
+
+.masthead-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding-block: var(--space-xs);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  text-decoration: none;
+  min-width: 0;
+}
+.wordmark .mark { flex: none; width: 1.75rem; height: 1.75rem; }
+.wordmark-tagline { display: none; }
+
+.nav {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav a { text-decoration: none; white-space: nowrap; }
+
+@media (min-width: 46rem) {
+  .masthead-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-block: var(--space-sm);
+  }
+  .nav { margin-inline: 0; padding-inline: 0; gap: var(--space-md); }
+  .wordmark-tagline { display: inline; }
+}
+
+/* ===================================================================
+ * Hero
+ * =================================================================== */
+
+.hero { display: grid; gap: var(--space-md); padding-block: var(--space-lg) var(--space-xl); align-items: center; }
+.hero-text > * + * { margin-top: var(--space-md); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+.hero-art { width: 100%; }
+.hero-art svg { width: 100%; height: auto; }
+
+@media (min-width: 52rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--space-xl);
+    padding-block: var(--space-xl) var(--space-2xl);
+  }
+  .hero-text { grid-column: 1; }
+  .hero-art { grid-column: 2; }
+}
+
+/* ===================================================================
+ * Prose
+ * =================================================================== */
+
+.prose { max-width: var(--measure-wide); }
+.prose > * + * { margin-top: var(--space-md); }
+.prose p { max-width: var(--measure-wide); }
+.prose ul, .prose ol { padding-left: 1.3em; }
+.prose li + li { margin-top: var(--space-2xs); }
+.prose h2 { margin-top: var(--space-xl); }
+.prose h3 { margin-top: var(--space-lg); }
+.prose h4 { margin-top: var(--space-md); }
+
+.prose pre { overflow-x: auto; }
+
+.anchor {
+  margin-left: 0.4em;
+  text-decoration: none;
+  font-size: 0.75em;
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus-visible { opacity: 1; }
+@media (hover: none) { .anchor { opacity: 0.4; } }
+
+/* Wide tables scroll inside their own box; the page never scrolls sideways. */
+.table-scroll { overflow-x: auto; }
+.table-scroll table { border-collapse: collapse; width: 100%; }
+.table-scroll th, .table-scroll td { text-align: left; vertical-align: top; }
+
+/* ===================================================================
+ * Page furniture
+ * =================================================================== */
+
+.page-head { margin-bottom: var(--space-lg); }
+.crumbs ol { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-3xs); }
+.crumbs a { text-decoration: none; }
+
+.factbox { display: grid; gap: var(--space-xs); margin-top: var(--space-md); }
+.factbox dd { margin: 0; }
+@media (min-width: 40rem) {
+  .factbox { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: var(--space-3xs); margin-top: var(--space-2xs); }
+
+/* auto-FILL, not auto-fit: one product should occupy one track, not stretch. */
+.cards { display: grid; gap: var(--space-md); margin-top: var(--space-lg); }
+@media (min-width: 44rem) { .cards { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); } }
+@media (min-width: 62rem) { .cards-wide { grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); } }
+
+.card { display: flex; flex-direction: column; gap: var(--space-2xs); overflow: hidden; }
+.card .badge { align-self: flex-start; }
+.card-art svg { width: 100%; height: auto; display: block; }
+.card-limitation { margin-top: auto; }
+
+.post-list { list-style: none; padding: 0; display: grid; gap: var(--space-md); }
+.post-item { display: grid; gap: var(--space-3xs); }
+.post-item > a { text-decoration: none; }
+.post-meta { display: flex; flex-wrap: wrap; gap: var(--space-3xs); align-items: center; }
+.post-cover svg { width: 100%; height: auto; display: block; }
+.post-footer { margin-top: var(--space-xl); display: grid; gap: var(--space-2xs); }
+
+.figure { margin-block: var(--space-lg); }
+.figure svg { width: 100%; height: auto; }
+.figure figcaption { margin-top: var(--space-2xs); max-width: var(--measure); }
+
+.footer { padding-block: var(--space-lg) var(--space-xl); }
+.footer .wrap { display: grid; gap: var(--space-sm); }
+.footer-links { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.footer-links a { text-decoration: none; }
+.footer-licence, .footer-nothing, .footer-machine { max-width: var(--measure-wide); }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background var(--duration) var(--ease), color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease);
+}
+.more { text-decoration: none; }
+.more:hover { text-decoration: underline; }
+
+/* ===================================================================
+ * Style guide (/design/)
+ * =================================================================== */
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: var(--space-2xs); margin-block: var(--space-md); }
+.swatch { overflow: hidden; }
+.swatch-chip { height: 3.5rem; }
+.swatch-label { font-family: var(--font-mono); font-size: var(--text-xs); }
+.type-specimen { display: grid; gap: var(--space-2xs); margin-block: var(--space-md); }
+.type-specimen .label { font-family: var(--font-mono); font-size: var(--text-xs); }
+.space-scale { display: grid; gap: var(--space-3xs); margin-block: var(--space-md); }
+.space-row { display: flex; align-items: center; gap: var(--space-2xs); font-family: var(--font-mono); font-size: var(--text-xs); }
+.space-bar { background: var(--accent); height: 0.75rem; flex: none; }
+
+/* ===================================================================
+ * The theme-preview bar. Review chrome only — never in a real build.
+ * =================================================================== */
+
+.preview-bar {
+  background: var(--ink-strong);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-2xs) var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs) var(--space-sm);
+}
+.preview-bar b { font-weight: 600; letter-spacing: 0.04em; }
+.preview-bar a { color: var(--paper); text-decoration: none; opacity: 0.62; border-bottom: 1px solid transparent; }
+.preview-bar a:hover { color: var(--paper); opacity: 1; }
+.preview-bar a[aria-current="true"] { opacity: 1; border-bottom-color: var(--paper); }
+.preview-bar .note { opacity: 0.45; }
+
+/* ===================================================================
+ * Print: the text, nothing else.
+ * =================================================================== */
+
+@media print {
+  .masthead, .footer, .skip, .crumbs, .hero-actions, .preview-bar { display: none; }
+  body { background: #fff; color: #000; }
+  .prose { max-width: none; }
+  a::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}

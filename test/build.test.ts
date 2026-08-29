@@ -192,12 +192,12 @@ test("a product states its limitation before its features", () => {
   assert.ok(limitation < firstHeading, "the limitation appears after the first section");
 });
 
-test("the theme is linked before the components that depend on it", () => {
+test("the theme is linked before the structural layer that reads its tokens", () => {
   for (const file of htmlPages()) {
-    const theme = file.contents.indexOf('href="/theme.css"');
-    const styles = file.contents.indexOf('href="/styles.css"');
-    assert.ok(theme > 0 && styles > 0, `${file.path} is missing a stylesheet`);
-    assert.ok(theme < styles, `${file.path} links styles.css before theme.css`);
+    const theme = file.contents.indexOf('href="/themes/');
+    const base = file.contents.indexOf('href="/base.css"');
+    assert.ok(theme > 0 && base > 0, `${file.path} is missing a stylesheet`);
+    assert.ok(theme < base, `${file.path} links base.css before its theme`);
   }
 });
 
