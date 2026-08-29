@@ -108,13 +108,19 @@ It is deliberately hard where scheduling software is usually wrong:
 - A daily cap counts on the **owner's** local date. Not UTC's. Not the
   requester's.
 
-Both category leaders have open bugs in the last two of those today. Thirty-six
-acceptance cases and twelve unit tests hold them, and those tests were frozen
-before the implementation was written.
+Both category leaders have open bugs in the last two of those today. A
+language-neutral acceptance suite holds them, frozen when the specification was
+approved and untouchable by the agent that implemented against it.
 
 ```
-npm test        # 128: 36 engine acceptance, 12 engine unit, 80 service
+npm test
 ```
+
+No test count is quoted here. The suite is
+[`core/spec/acceptance/cases.json`](https://github.com/pumasi-ai/pumasi-booking/blob/main/core/spec/acceptance/cases.json)
+and `npm test` prints the current totals; a number copied into prose is a cache
+with no way to invalidate it. This page carried one that was out by more than
+half before anyone noticed.
 
 ## How it is laid out
 
