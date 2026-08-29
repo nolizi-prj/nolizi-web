@@ -137,7 +137,12 @@ it over with its history intact.
 
 ## Deploying it
 
-Anywhere that runs a container or Node 22.
+Two builds, and **neither one is the real one.** Self-hosting is first-class
+permanently — a hosted deployment is a convenience, never a capability the
+self-hosted build lacks. A project that documented only one of these would be
+quietly making the other the copy.
+
+**Self-hosted** — Node 22 or a container, with PostgreSQL:
 
 ```
 docker compose up          # service + PostgreSQL, locally
@@ -145,10 +150,31 @@ docker build -t pumasi .   # then run it wherever
 ```
 
 Set `PORT`, and `DATABASE_URL` for anything that must outlive the process.
-`PGSSL=require` if your provider needs TLS. Mail is **SMTP, not a provider
-SDK** — every provider speaks it, so the choice is a URL and switching costs
-nothing.
+`PGSSL=require` if your provider needs TLS.
 
-Nothing in the code knows about a particular host. That is not an accident and
-it is not going to change: no special protocol is required to participate, and
-self-hosting stays first-class forever.
+**Cloudflare Workers** — one SQLite-backed Durable Object per tenant
+organisation, each holding a single company's entire world: the same schema and
+the same request handling as the single-tenant service, with one writer.
+
+### The guarantee holds on both
+
+No-double-booking is enforced **inside the database**, never in application
+code: a `btree_gist` exclusion constraint on PostgreSQL, and `BEFORE INSERT` and
+`BEFORE UPDATE` triggers raising `ABORT` on SQLite. Different mechanism, same
+*kind* of mechanism — the check happens within the write, so two concurrent
+bookings cannot both win. Neither dialect gets the weaker deal.
+
+### Mail differs by build, and it is worth knowing which you have
+
+The **self-hosted** build sends over SMTP — every provider speaks it, so the
+choice is a URL and switching costs nothing — and it refuses at runtime to send
+through a host that is not in the subprocessor register.
+
+The **Workers** build sends through the Gmail API instead. There, what
+constrains the transport is which one the build constructs: a code change,
+visible in review, rather than a runtime guard. That is a **weaker control**,
+and it is worth naming as weaker rather than describing both paths in language
+that only the first one earns.
+
+Beyond those two builds, nothing in the code knows about a particular host, and
+no special protocol is required to participate.
