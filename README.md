@@ -110,6 +110,46 @@ so re-theming redraws every illustration on the site at once. The figures are
 Product front matter adds `compareTo`, `status`, `repo` and `limitation`; the
 limitation is rendered **above** the features, on purpose.
 
+## Where the claims on this site come from
+
+Almost everything here describes software that lives in **another repository**.
+That makes nearly every factual sentence on this site a *restatement*, and
+restatements fork.
+
+Six corrections in one day taught this the expensive way; the rule is recorded
+in the commons as
+[L-007](https://github.com/pumasi-ai/governance/blob/main/lessons/L-007-restating-a-rule-forks-it.md):
+
+> **Verify against the artefact, never against another document's claim about
+> it.** Count `cases.json`, run the suite, read `config.ts`, list the directory.
+
+If the only evidence for a sentence is that another file says the same thing,
+there is no evidence. The agreement between two documents is the *symptom* of a
+fork, and it will be offered to you as proof against one. This applies with most
+force to the documents that look most authoritative: a README is a restatement
+of the code, and checking against it feels like checking. Every wrong claim
+found on this site had been checked against upstream and matched it.
+
+Three habits follow.
+
+**No counts in evergreen prose.** A number that has to be hand-synced with a
+directory in another repository is a cache with no way to invalidate it. Point
+at the command or the file. Dated content is exempt — a figure in a post carries
+its dateline, and the dateline *is* the invalidation. This page said "seven
+lessons" until there were nine, and the product page quoted a test total that
+was out by more than half.
+
+**A claim about a system with two execution paths is over-scoped by default.**
+Name the path, or name the weaker control in words that do not borrow the
+stronger one's credit. The service self-hosts on Node and PostgreSQL and
+deploys on Workers and SQLite; sentences true of one were repeatedly written as
+though true of both.
+
+**No uncited claim about anyone else's product.** A commons that discards
+uncited objections about its own code does not get to publish uncited
+assertions about someone else's. If a comparison cannot carry a citation and a
+date, it does not go on the page.
+
 ## The design theme
 
 Two stylesheets:
