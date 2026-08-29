@@ -206,14 +206,31 @@ else — no runtime, no database, no build step at the edge.
 
     npm run build && rsync -a site/ your-host:/var/www/pumasi/
 
-A GitHub Actions workflow that publishes to GitHub Pages is in
-[`.github/workflows/`](.github/workflows/). It is one convenience among several,
-not a dependency: nothing in this repository knows about a particular host, which
-is the same commitment every Pumasi product makes.
+**Where it actually runs.** `https://pumasi.ai` is a
+[Cloudflare Pages](https://developers.cloudflare.com/pages/) project named
+`pumasi-web`, with the apex as a CNAME to `pumasi-web.pages.dev` (flattened by
+Cloudflare) and `https://pumasi-web.pages.dev` serving the same build. To
+publish by hand:
 
-Configure the server for extensionless URLs (`/about/` → `about/index.html`) and
-serve `.md` as `text/markdown`. `npm run serve` resolves paths the same way, so
-what works locally works there.
+    npm run build
+    npx wrangler pages deploy site --project-name=pumasi-web --branch=main
+
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) does the same on
+every push to `main`, and skips the publish step until
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are set as repository
+secrets — so the build and tests gate every push whether or not the deploy is
+wired up.
+
+**Cloudflare is a convenience, not a dependency.** Nothing in this repository
+knows about it beyond that one workflow file and that one command: no adapter,
+no framework integration, no build step that only runs there. Moving the site
+to any static host is a copy of `site/`. That is the same commitment every
+Pumasi product makes, and the reason it is worth stating is that it is easy to
+lose by accident.
+
+Configure a self-hosted server for extensionless URLs (`/about/` →
+`about/index.html`) and serve `.md` as `text/markdown`. `npm run serve`
+resolves paths the same way, so what works locally works there.
 
 ## What it does not do yet
 

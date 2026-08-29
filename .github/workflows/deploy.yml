@@ -1,0 +1,39 @@
+# Publish to Cloudflare Pages.
+#
+# This is one convenience among several, not a dependency. `npm run build`
+# produces a directory of static files; any web server can serve it. Nothing in
+# this repository knows about a particular host, which is the same commitment
+# every Pumasi product makes — see "Deploying" in the README for the
+# host-agnostic path.
+#
+# Requires two repository secrets. Until they are set the deploy job skips
+# rather than failing, so the build and tests above still gate every push:
+#
+#   CLOUDFLARE_API_TOKEN   a token with Cloudflare Pages: Edit
+#   CLOUDFLARE_ACCOUNT_ID  the account owning the `pumasi-web` Pages project
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Publish
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=pumasi-web --branch=main
