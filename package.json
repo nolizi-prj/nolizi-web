@@ -10,13 +10,12 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node dist/build.js",
-    "clean": "rm -rf dist site preview .build",
+    "clean": "rm -rf dist site .build",
     "serve": "node dist/serve.js",
     "dev": "npm run build && npm run serve",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "build:test": "tsc -p tsconfig.test.json",
-    "test": "npm run build:test && node --test .build/test/*.test.js",
-    "preview": "tsc -p tsconfig.json && node dist/preview.js"
+    "build:test": "rm -rf .build && tsc -p tsconfig.test.json",
+    "test": "npm run build:test && node --test .build/test/*.test.js"
   },
   "dependencies": {
     "marked": "^15.0.7"

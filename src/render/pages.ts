@@ -6,7 +6,6 @@
 import { escapeHtml } from "../html.js";
 import { renderInline } from "../markdown.js";
 import { coverArt, heroArt, plotArt } from "./art.js";
-import type { Theme } from "../themes.js";
 import type { RenderedDoc, SiteConfig } from "../types.js";
 
 const MONTHS = [
@@ -45,7 +44,6 @@ export function renderHome(
   doc: RenderedDoc,
   products: RenderedDoc[],
   posts: RenderedDoc[],
-  theme: Theme,
 ): string {
   return `      <div class="wrap">
         <section class="hero">
@@ -57,23 +55,23 @@ export function renderHome(
               <a class="button button-quiet" href="/about/">Why it exists</a>
             </p>
           </div>
-          <div class="hero-art">${heroArt(theme.art)}</div>
+          <div class="hero-art">${heroArt()}</div>
         </section>
 
         <article class="prose">
 ${doc.html}
         </article>
 
-        ${products.length ? productSection(products, theme) : ""}
+        ${products.length ? productSection(products) : ""}
         ${posts.length ? postSection(posts.slice(0, 4)) : ""}
       </div>`;
 }
 
-function productSection(products: RenderedDoc[], theme: Theme): string {
+function productSection(products: RenderedDoc[]): string {
   return `<section class="section" aria-labelledby="products-heading">
           <h2 id="products-heading">What exists today</h2>
           <div class="cards">
-            ${products.map((p) => productCard(p, theme)).join("\n            ")}
+            ${products.map(productCard).join("\n            ")}
           </div>
         </section>`;
 }
@@ -88,11 +86,11 @@ function postSection(posts: RenderedDoc[]): string {
         </section>`;
 }
 
-export function productCard(doc: RenderedDoc, theme: Theme): string {
+export function productCard(doc: RenderedDoc): string {
   const compareTo = (doc.matter.compareTo ?? []) as string[];
   const status = doc.matter.status ? String(doc.matter.status) : null;
   return `<article class="card">
-              <div class="card-art">${plotArt(doc.slug, 560, 150, 0.45, theme.artRadius)}</div>
+              <div class="card-art">${plotArt(doc.slug, 560, 150, 0.45)}</div>
               <h3><a href="${escapeHtml(doc.urlPath)}">${escapeHtml(doc.matter.title)}</a></h3>
               ${status ? `<p class="badge badge-${escapeHtml(status)}">${escapeHtml(status)}</p>` : ""}
               <p>${renderInline(doc.matter.description)}</p>
@@ -122,7 +120,7 @@ export function postListItem(doc: RenderedDoc): string {
 }
 
 /** A single product page. */
-export function renderProduct(doc: RenderedDoc, _theme: Theme): string {
+export function renderProduct(doc: RenderedDoc): string {
   const compareTo = (doc.matter.compareTo ?? []) as string[];
   const repo = doc.matter.repo ? String(doc.matter.repo) : null;
   const status = doc.matter.status ? String(doc.matter.status) : null;
@@ -151,11 +149,7 @@ ${doc.html}
 }
 
 /** The products index. */
-export function renderProductIndex(
-  intro: RenderedDoc | null,
-  products: RenderedDoc[],
-  theme: Theme,
-): string {
+export function renderProductIndex(intro: RenderedDoc | null, products: RenderedDoc[]): string {
   return `      <div class="wrap">
         <header class="page-head">
           <h1>${escapeHtml(intro?.matter.title ?? "Products")}</h1>
@@ -163,7 +157,7 @@ export function renderProductIndex(
         </header>
         ${intro ? `<article class="prose">${intro.html}</article>` : ""}
         <div class="cards cards-wide">
-          ${products.map((p) => productCard(p, theme)).join("\n          ")}
+          ${products.map(productCard).join("\n          ")}
         </div>
       </div>`;
 }
@@ -186,14 +180,14 @@ export function renderBlogIndex(intro: RenderedDoc | null, posts: RenderedDoc[])
 }
 
 /** A single post. */
-export function renderPost(doc: RenderedDoc, site: SiteConfig, theme: Theme): string {
+export function renderPost(doc: RenderedDoc, site: SiteConfig): string {
   const date = doc.matter.date ?? "";
   const tags = (doc.matter.tags ?? []) as string[];
 
   return `      <div class="wrap">
         <article class="prose">
         ${crumbs([{ name: "Writing", path: "/blog/" }, { name: doc.matter.title, path: doc.urlPath }])}
-        <div class="post-cover">${coverArt(doc.slug, 1000, 260, theme.artRadius ? 3 : 0)}</div>
+        <div class="post-cover">${coverArt(doc.slug, 1000, 260)}</div>
         <header class="page-head">
           <h1>${escapeHtml(doc.matter.title)}</h1>
           <p class="lede">${renderInline(doc.matter.description)}</p>

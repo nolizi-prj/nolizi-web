@@ -34,9 +34,7 @@ costs one extra file per page.
     npm run serve      # → http://localhost:8080
     npm run dev        # both
 
-    npm preview        # all three themes side by side
-
-    npm test           # 53 tests, no network, no browser
+    npm test           # 51 tests, no network, no browser
 
 Node 22+. One runtime dependency — `marked`, for Markdown — because
 hand-rolling a Markdown parser would be the exact error the commons rejects
@@ -54,7 +52,7 @@ elsewhere.
 | `sitemap.xml` | Search engines. Canonical HTML URLs only — never the Markdown twins. |
 | `feed.xml` | Atom, with the full text of each post in the entry. |
 | `robots.txt` | The crawl policy, with the major AI crawlers **named and allowed**. |
-| `base.css`, `themes/*.css` | The structural layer, and the interchangeable design themes. |
+| `theme.css`, `base.css` | The design, and the colour-free structural layer that reads its tokens. |
 | `favicon.svg` | Self-contained, with its own dark-mode rule. |
 
 ## Layout
@@ -65,14 +63,13 @@ elsewhere.
       products/          one file per product
       blog/              YYYY-MM-DD-slug.md — the date prefix is not in the URL
     assets/
+      theme.css          the design: tokens plus the components built on them
       base.css           structure only: no colour, font or size of its own
-      themes/            one file per design theme: tokens plus components
     src/
       build.ts           the one pass that produces both renderings
       content.ts         loading and validating content
       frontmatter.ts     a strict, tiny YAML subset that never guesses
       markdown.ts        Markdown → HTML, headings, plain text
-      themes.ts          the theme registry
       render/            layout, page templates, the SVG art system, shortcodes
       seo/               <head> metadata and JSON-LD
       emit/              sitemap, robots, feed, llms.txt, index.json, twins
@@ -113,50 +110,54 @@ so re-theming redraws every illustration on the site at once. The figures are
 Product front matter adds `compareTo`, `status`, `repo` and `limitation`; the
 limitation is rendered **above** the features, on purpose.
 
-## The design themes
+## The design theme
 
-The site is themed in two layers:
+Two stylesheets:
 
+- **`assets/theme.css`** — the design. Tokens (colour, type, space, shape,
+  motion) and the components built on them.
 - **`assets/base.css`** — structure, layout, landmarks, accessibility, print.
   It holds **no colour, no font and no size of its own**; every visual decision
-  is a token it reads.
-- **`assets/themes/<id>.css`** — the tokens, plus the components built on them.
+  is a token it reads from the theme. A test enforces this, exempting only the
+  print block, where black ink on white paper is a fact about printing rather
+  than a design decision the theme should own.
 
-Swapping the theme file swaps the design without touching a line of markup.
-Three are in the repository:
+The theme is **Console**: monospace everywhere — headings, body, navigation —
+with square corners, visible borders and console punctuation (`##` before a
+section heading, bracketed navigation, a block caret after the headline).
+Dark-first, with a real light scheme rather than an inversion.
 
-| Theme | Direction | Drawn from |
-|---|---|---|
-| **`signal`** | High-contrast and engineered. Near-black on white, one blue that only ever means "interactive", headlines at −0.045em, and a great deal of space. | Vercel · Linear · Stripe |
-| **`console`** | Monospace everywhere. Square corners, visible borders, console punctuation. The site looks like the machine-readable artefact it is. | Bun · Raycast · Resend |
-| **`press`** | Editorial and structural. Type at hero scale, numbered sections under thick rules, one signal red. | 2026 brutalist-editorial · Swiss print |
+That is not decoration. A commons whose whole argument is that it is legible to
+machines should look like the artefact it is, and mono-as-brand is where
+developer-facing design actually is right now — Bun, Raycast, Resend, and the
+wider "mono everywhere" turn.
 
-Compare them side by side, same content and markup in all three:
+Two rules for anyone extending it. **Never write a literal colour outside
+`theme.css`** — `base.css` contains none, and a test enforces it. And tokens are
+named for their **role**: `--accent`, never `--green`. A token named for what it
+looks like has to be renamed when the look changes, which is how a theme layer
+stops being one.
 
-    npm run preview     # → :8081 :8082 :8083, with a switcher bar
+**No web fonts.** A font request is a third-party request, a blocking paint and
+a layout shift, in exchange for a typeface most readers will not consciously
+notice — and this theme wants the reader's own monospace anyway. That is a
+decision, not a law: self-hosting one face would be a single file and one token
+change.
 
-Build a specific one:
-
-    PUMASI_THEME=console npm run build
-
-Two rules for anyone extending a theme. **Never write a literal colour outside
-a theme file** — `base.css` contains none, and a test enforces it. And every
-theme supplies the **same token vocabulary**: `--accent`, never `--clay`. A
-token named for what it looks like has to be renamed when the look changes,
-which is how a theme layer stops being one.
-
-**No web fonts, in any theme.** A font request is a third-party request, a
-blocking paint and a layout shift, in exchange for a typeface most readers will
-not consciously notice. That is a decision, not a law: self-hosting one display
-face would be a single file and one token change.
+Because `base.css` is colour-free and the token names are stable, the design is
+genuinely swappable. Two alternates — `signal` (high-contrast, Vercel/Linear
+school) and `press` (editorial-brutalist) — were built, compared side by side,
+and dropped once Console was chosen. They are in the history at `e2ccb3a` if
+that decision is ever worth reopening; keeping the registry, the preview server
+and the per-theme art branching alive to serve a decision already made would be
+machinery ahead of evidence, which is the mistake this commons keeps paying for.
 
 Illustrations are SVG generated at build time and inlined, so one drawing is
-correct in light and dark **and in every theme**, costs no request at any size,
-and is seeded from the page's own address. Each theme supplies a corner radius
-and an art style, so the drawings share a vocabulary without sharing a
-personality.
+correct in light and dark, costs no request at any size, and is seeded from the
+page's own address — every product and post gets its own picture, identical in
+every build.
 
-The tokens in use are documented and rendered live at `/design/`.
+The tokens are documented and rendered live at `/design/`.
 
 ## Deploying
 

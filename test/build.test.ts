@@ -194,10 +194,10 @@ test("a product states its limitation before its features", () => {
 
 test("the theme is linked before the structural layer that reads its tokens", () => {
   for (const file of htmlPages()) {
-    const theme = file.contents.indexOf('href="/themes/');
+    const theme = file.contents.indexOf('href="/theme.css"');
     const base = file.contents.indexOf('href="/base.css"');
     assert.ok(theme > 0 && base > 0, `${file.path} is missing a stylesheet`);
-    assert.ok(theme < base, `${file.path} links base.css before its theme`);
+    assert.ok(theme < base, `${file.path} links base.css before theme.css`);
   }
 });
 

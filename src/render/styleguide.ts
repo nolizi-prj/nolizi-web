@@ -141,14 +141,14 @@ ${colours}
 
         <h2 id="reuse">Taking the theme</h2>
         <p>
-          Every theme file supplies the same token vocabulary — <code>--accent</code>,
-          never <code>--clay</code>. A token named for what it looks like has to
-          be renamed when the look changes, which is how a theme layer stops
-          being one. Because the names are stable, another Pumasi product can
-          link a theme and inherit the palette, the type scale and the spacing
-          without inheriting this website's layout:
+          Tokens are named for their role — <code>--accent</code>, never
+          <code>--green</code>. A token named for what it looks like has to be
+          renamed when the look changes, which is how a theme layer stops being
+          one. Another Pumasi product can link this file and inherit the
+          palette, the type scale and the spacing without inheriting this
+          website's layout:
         </p>
-        <pre tabindex="0"><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;https://pumasi.ai/themes/signal.css&quot;&gt;</code></pre>
+        <pre tabindex="0"><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;https://pumasi.ai/theme.css&quot;&gt;</code></pre>
         <p>
           Or copy the file. It is Apache-2.0, it has no dependencies, and it is
           under three hundred lines. Copying it is the expected thing to do —

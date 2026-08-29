@@ -39,7 +39,6 @@ import {
 import { renderStyleGuide } from "./render/styleguide.js";
 import { assertNoStrayShortcodes, expandShortcodes } from "./render/shortcodes.js";
 import { faviconSvg } from "./render/art.js";
-import { DEFAULT_THEME, themeById, type Theme } from "./themes.js";
 import { renderFeed } from "./emit/feed.js";
 import { renderLlmsFull, renderLlmsIndex } from "./emit/llms.js";
 import { renderMachineIndex, renderMarkdownTwin } from "./emit/machine.js";
@@ -83,25 +82,12 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export interface BuildOptions {
-  /** Which design theme to render. Defaults to the registry default. */
-  themeId?: string;
-  /**
-   * Review-only chrome injected above the masthead, built per URL so that
-   * switching theme keeps you on the page you were reading. Absent in a real
-   * build.
-   */
-  previewBar?: (urlPath: string) => string;
-}
-
-export async function build(outDir = OUT, options: BuildOptions = {}): Promise<OutputFile[]> {
-  const theme = themeById(options.themeId ?? DEFAULT_THEME);
-  const bar = (urlPath: string) => options.previewBar?.(urlPath);
+export async function build(outDir = OUT): Promise<OutputFile[]> {
   const site = await loadSiteConfig(CONTENT);
   const docs = await loadContent(CONTENT);
   const date = today();
 
-  const rendered = docs.map((doc) => renderDoc(doc, theme));
+  const rendered = docs.map((doc) => renderDoc(doc));
   const rendering = new Map(rendered.map((doc) => [doc.slug, doc]));
 
   const pages = rendered
@@ -121,10 +107,7 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
 
   for (const doc of rendered) {
     if (!SECTION_INTROS.has(doc.slug)) {
-      files.push({
-        path: outputHtmlPath(doc.slug),
-        contents: htmlFor(site, doc, products, posts, theme, bar),
-      });
+      files.push({ path: outputHtmlPath(doc.slug), contents: htmlFor(site, doc, products, posts) });
     }
     files.push({ path: outputMarkdownPath(doc.slug), contents: renderMarkdownTwin(site, doc) });
   }
@@ -138,8 +121,6 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
     path: "products/index.html",
     contents: renderLayout({
       site,
-      theme,
-      previewBar: bar("/products/"),
       title: productIntro?.matter.title ?? "Products",
       description:
         productIntro?.matter.description ??
@@ -166,7 +147,7 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
           })),
         },
       ],
-      main: renderProductIndex(productIntro, products, theme),
+      main: renderProductIndex(productIntro, products),
     }),
   });
 
@@ -174,8 +155,6 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
     path: "blog/index.html",
     contents: renderLayout({
       site,
-      theme,
-      previewBar: bar("/blog/"),
       title: blogIntro?.matter.title ?? "Writing",
       description:
         blogIntro?.matter.description ??
@@ -219,8 +198,8 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
     contents: renderLlmsFull(site, [home, ...pages, ...products, ...posts], date),
   });
   files.push({ path: "index.json", contents: renderMachineIndex(site, rendered, date) });
-  files.push({ path: "favicon.svg", contents: faviconSvg(theme) });
-  files.push({ path: "404.html", contents: notFoundPage(site, theme, bar("/404.html")) });
+  files.push({ path: "favicon.svg", contents: faviconSvg() });
+  files.push({ path: "404.html", contents: notFoundPage(site) });
 
   // Assets are copied rather than generated, so the link checker is told
   // about them explicitly instead of inferring a whole directory.
@@ -236,10 +215,10 @@ export async function build(outDir = OUT, options: BuildOptions = {}): Promise<O
   return files;
 }
 
-function renderDoc(doc: Doc, theme: Theme): RenderedDoc {
+function renderDoc(doc: Doc): RenderedDoc {
   const { html, headings, text } = renderMarkdown(doc.body);
   const context = doc.source;
-  const expanded = expandShortcodes(html, context, theme.artRadius);
+  const expanded = expandShortcodes(html, context);
   assertNoStrayShortcodes(expanded, context);
 
   return {
@@ -257,23 +236,18 @@ function htmlFor(
   doc: RenderedDoc,
   products: RenderedDoc[],
   posts: RenderedDoc[],
-  theme: Theme,
-  bar: (urlPath: string) => string | undefined,
 ): string {
   const words = doc.text.split(/\s+/).filter(Boolean).length;
-  const previewBar = bar(doc.urlPath);
 
   if (doc.slug === "") {
     return renderLayout({
       site,
-      theme,
-      previewBar,
       title: doc.matter.title,
       description: doc.matter.description,
       urlPath: "/",
       markdownPath: doc.markdownPath,
       jsonLd: [ld.organisation(site), ld.website(site)],
-      main: renderHome(doc, products, posts, theme),
+      main: renderHome(doc, products, posts),
       bodyClass: "home",
     });
   }
@@ -281,8 +255,6 @@ function htmlFor(
   if (doc.kind === "product") {
     return renderLayout({
       site,
-      theme,
-      previewBar,
       title: doc.matter.title,
       description: doc.matter.description,
       urlPath: doc.urlPath,
@@ -297,15 +269,13 @@ function htmlFor(
           { name: doc.matter.title, path: doc.urlPath },
         ]),
       ],
-      main: renderProduct(doc, theme),
+      main: renderProduct(doc),
     });
   }
 
   if (doc.kind === "post") {
     return renderLayout({
       site,
-      theme,
-      previewBar,
       title: doc.matter.title,
       description: doc.matter.description,
       urlPath: doc.urlPath,
@@ -324,7 +294,7 @@ function htmlFor(
           { name: doc.matter.title, path: doc.urlPath },
         ]),
       ],
-      main: renderPost(doc, site, theme),
+      main: renderPost(doc, site),
     });
   }
 
@@ -333,8 +303,6 @@ function htmlFor(
 
   return renderLayout({
     site,
-    theme,
-    previewBar,
     title: doc.matter.title,
     description: doc.matter.description,
     urlPath: doc.urlPath,
@@ -352,11 +320,9 @@ function htmlFor(
   });
 }
 
-function notFoundPage(site: SiteConfig, theme: Theme, previewBar: string | undefined): string {
+function notFoundPage(site: SiteConfig): string {
   return renderLayout({
     site,
-    theme,
-    previewBar,
     title: "Not here",
     description: "That page does not exist on this site.",
     urlPath: "/404.html",
@@ -434,8 +400,7 @@ async function writeAll(outDir: string, files: OutputFile[]): Promise<void> {
 /** Only run when executed directly, so tests can import `build`. */
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
   const started = Date.now();
-  const themeId = process.env.PUMASI_THEME ?? DEFAULT_THEME;
-  const files = await build(OUT, { themeId });
+  const files = await build();
   const bytes = files.reduce((sum, f) => sum + Buffer.byteLength(f.contents), 0);
   const kinds = new Map<string, number>();
   for (const file of files) {
@@ -454,13 +419,11 @@ if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import
   // A quiet reassurance that the two audiences really did both get served.
   const md = files.filter((f) => f.path.endsWith(".md")).length;
   const html = files.filter((f) => f.path.endsWith(".html")).length;
-  process.stdout.write(
-    `  theme "${themeId}" — ${html} HTML pages, ${md} Markdown twins, ${await readSize(themeId)} of CSS\n`,
-  );
+  process.stdout.write(`  ${html} HTML pages, ${md} Markdown twins, ${await readSize()} of CSS\n`);
 }
 
-async function readSize(themeId: string): Promise<string> {
+async function readSize(): Promise<string> {
   const base = await readFile(join(ASSETS, "base.css"), "utf8");
-  const theme = await readFile(join(ASSETS, "themes", `${themeId}.css`), "utf8");
+  const theme = await readFile(join(ASSETS, "theme.css"), "utf8");
   return `${((base.length + theme.length) / 1024).toFixed(0)} kB`;
 }

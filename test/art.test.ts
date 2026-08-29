@@ -1,7 +1,6 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { coverArt, faviconSvg, heroArt, logoMark, plotArt } from "../src/render/art.js";
-import { THEMES, themeById } from "../src/themes.js";
 
 test("seeded art is identical between builds", () => {
   assert.equal(plotArt("pumasi-booking"), plotArt("pumasi-booking"));
@@ -25,23 +24,14 @@ test("decorative art is hidden from assistive technology; described art is not",
 });
 
 test("the favicon is self-contained, since a favicon gets no page CSS", () => {
-  for (const theme of THEMES) {
-    const svg = faviconSvg(theme);
-    assert.doesNotMatch(svg, /var\(--/, theme.id);
-    assert.match(svg, /prefers-color-scheme: dark/, theme.id);
-    assert.match(svg, /^<svg /, theme.id);
+  const svg = faviconSvg();
+  assert.doesNotMatch(svg, /var\(--/);
+  assert.match(svg, /prefers-color-scheme: dark/);
+  assert.match(svg, /^<svg /);
+});
+
+test("the art has no curves, because the theme has none", () => {
+  for (const svg of [heroArt(), plotArt("x", 560, 240, 0.9), coverArt("y"), logoMark()]) {
+    assert.doesNotMatch(svg, /<circle|<ellipse|rx="[1-9]/, "a rounded shape in a square theme");
   }
-});
-
-test("each art style draws its own mark and hero", () => {
-  const marks = THEMES.map((t) => logoMark(t.art));
-  assert.equal(new Set(marks).size, marks.length, "two themes share a mark");
-  const heroes = THEMES.map((t) => heroArt(t.art));
-  assert.equal(new Set(heroes).size, heroes.length, "two themes share a hero drawing");
-});
-
-test("a square theme gets square art", () => {
-  const square = themeById("press");
-  assert.equal(square.artRadius, 0);
-  assert.doesNotMatch(plotArt("x", 560, 240, 0.9, square.artRadius), /<circle/);
 });
