@@ -1,0 +1,32 @@
+{
+  "$comment": "Site-wide configuration. Everything here appears in the rendered HTML, in the machine-readable outputs, or in both. There is nothing decorative in this file.",
+  "name": "Pumasi",
+  "url": "https://pumasi.ai",
+  "tagline": "a commons of working software",
+  "description": "Pumasi is a commons of working software, built by agents and governed by people. Apache-2.0, self-hostable, and honest about what it cannot do yet.",
+  "lang": "en",
+  "licence": "Apache-2.0",
+  "org": {
+    "name": "Pumasi",
+    "github": "https://github.com/pumasi-ai",
+    "catalog": "https://github.com/pumasi-ai/pumasi/blob/main/catalog.json",
+    "governance": "https://github.com/pumasi-ai/governance",
+    "email": "hello@pumasi.ai"
+  },
+  "nav": [
+    { "label": "Products", "href": "/products/" },
+    { "label": "Writing", "href": "/blog/" },
+    { "label": "About", "href": "/about/" },
+    { "label": "How it works", "href": "/how-it-works/" },
+    { "label": "For machines", "href": "/for-machines/" }
+  ],
+  "footer": [
+    { "label": "Products", "href": "/products/" },
+    { "label": "Writing", "href": "/blog/" },
+    { "label": "About", "href": "/about/" },
+    { "label": "How it works", "href": "/how-it-works/" },
+    { "label": "For machines", "href": "/for-machines/" },
+    { "label": "Design", "href": "/design/" },
+    { "label": "GitHub", "href": "https://github.com/pumasi-ai" }
+  ]
+}

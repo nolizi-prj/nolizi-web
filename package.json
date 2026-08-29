@@ -1,0 +1,32 @@
+{
+  "name": "pumasi-web",
+  "version": "0.1.0",
+  "description": "The Pumasi website. Static HTML for people, Markdown and JSON for agents, from one source of content.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node dist/build.js",
+    "clean": "rm -rf dist site",
+    "serve": "node dist/serve.js",
+    "dev": "npm run build && npm run serve",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build:test && node --test .build/test/*.test.js"
+  },
+  "dependencies": {
+    "marked": "^15.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pumasi-ai/pumasi-web.git"
+  },
+  "homepage": "https://pumasi.ai"
+}
