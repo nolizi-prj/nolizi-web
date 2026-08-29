@@ -85,11 +85,15 @@ actual rules rather than a manifesto.
 
 ## What has gone wrong so far
 
-Seven lessons, each one paid for, are kept in the open in the
+Every lesson this project has paid for is kept in the open in the
 [governance repository](https://github.com/pumasi-ai/governance). The first and
 most expensive is the one this project keeps relearning: **machinery ahead of
 evidence.** Building the abstraction before there is a second example. Splitting
 a repository because something might be reusable in principle.
+
+The count is deliberately not given here. A number in prose that has to be
+hand-synced with a directory in another repository is a claim with nothing
+keeping it true — this page said "seven" until there were nine.
 
 That last one is not hypothetical. The scheduling engine was given its own
 repository because someone might want it alone. Nobody did. The split cost two
