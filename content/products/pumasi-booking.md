@@ -108,9 +108,10 @@ It is deliberately hard where scheduling software is usually wrong:
 - A daily cap counts on the **owner's** local date. Not UTC's. Not the
   requester's.
 
-Both category leaders have open bugs in the last two of those today. A
-language-neutral acceptance suite holds them, frozen when the specification was
-approved and untouchable by the agent that implemented against it.
+These are the cases calendar arithmetic is easiest to get wrong, which is why
+they are specified rather than left to the implementation. A language-neutral
+acceptance suite holds them, frozen when the specification was approved and
+untouchable by the agent that implemented against it.
 
 ```
 npm test
