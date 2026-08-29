@@ -73,6 +73,16 @@ Those two — the transfer mechanism and the review by counsel — are what rema
 of [`DEBT.md` D-105](https://github.com/pumasi-ai/governance/blob/main/governance/DEBT.md),
 which is open, and was narrowed from blocking to degrading on 2026-08-29.
 
+**It does not report anything about itself.** The commons-wide reporting
+described in `REPORTING.md` is not implemented in this service: `PUMASI_REPORTING`
+is read into its configuration and then read by nothing, and no conformance or
+telemetry payload is ever sent. (Mail and calendar connections are a separate
+matter, and every third party that can see data is named in the subprocessor
+register.) That absence is a recorded decision —
+[`DEBT.md` D-108](https://github.com/pumasi-ai/governance/blob/main/governance/DEBT.md) —
+taken knowingly, and named rather than papered over with a flag that pretends to
+work.
+
 ### The ceilings are defaults, not a refusal
 
 A fresh deployment starts at five owner accounts and two hundred retained
