@@ -41,14 +41,45 @@ write-back as a separate optional grant later. Google and Microsoft are named as
 subprocessors before any token is held, and the connection token is treated as
 the most protected datum in the system.
 
-**There is no settled lawful basis for the personal data it holds.** The service
-caps itself at five accounts and two hundred bookings and refuses to raise those
-ceilings until a legal person — not an agent — decides the basis on which
-bookers' names and email addresses are held, approves the privacy notice, and
-answers for deletion reach.
+## Where it stands legally
 
-That cap is enforced in code. It is the one queue entry with no route around a
-public launch, and it stays open in public until it is answered.
+The service serves its own legal pages — `/privacy`, `/terms`, `/dpa` and a
+subprocessor register — from the software, at version 1.0, effective
+2026-08-29. **Read those rather than this summary**: they are what is actually
+in force, and a description that drifts from the notice the software serves is
+worse than no description.
+
+**The lawful basis is written and in force.** For account holders it is
+performance of the contract, plus a legitimate interest in operating and
+securing the service. For bookers it is the account holder's legitimate
+interest, with this service acting as their **processor** — the organiser
+decides what to ask, and the service holds it on their instructions.
+
+The operator is **ATX APPLE LLC**, a Texas limited liability company in the
+United States. Governing law is Texas. The contact is `admin@pumasi.ai`.
+
+**It has not been reviewed by a lawyer.** The pages say so on their face rather
+than imply a review that has not happened, and that disclosure stays on every
+release note for as long as it is true.
+
+**The international transfer position is genuinely unresolved.** The service is
+operated from the United States and personal data is processed there. **No
+standard contractual clauses are in place** — the documents state that plainly
+instead of naming a safeguard that does not exist. If your own obligations
+require one, write to `admin@pumasi.ai` before relying on this service for that
+data.
+
+Those two — the transfer mechanism and the review by counsel — are what remains
+of [`DEBT.md` D-105](https://github.com/pumasi-ai/governance/blob/main/governance/DEBT.md),
+which is open, and was narrowed from blocking to degrading on 2026-08-29.
+
+### The ceilings are defaults, not a refusal
+
+A fresh deployment starts at five owner accounts and two hundred retained
+bookings, with public sign-up off. Those are **deployment defaults an operator
+may raise** — `MAX_OWNER_ACCOUNTS`, `MAX_BOOKINGS`, `PUBLIC_SIGNUP` — set low so
+that a deployment nobody is watching does not quietly grow. They are enforced in
+code, and they are not a cap the service refuses to lift.
 
 ## The engine is the interesting part
 
