@@ -110,6 +110,26 @@ so re-theming redraws every illustration on the site at once. The figures are
 Product front matter adds `compareTo`, `status`, `repo` and `limitation`; the
 limitation is rendered **above** the features, on purpose.
 
+## Contributing
+
+`main` is protected by a ruleset. Nothing lands on it without a pull request
+whose `build` check is green — the 51 tests and a full site build, including the
+strict checks above. Force pushes and branch deletion are blocked, and the
+bypass list is empty, so the rule binds the repository owner too.
+
+    git switch -c my-change
+    # edit, then:
+    npm test && npm run build
+    git push -u origin my-change
+    gh pr create --fill
+
+A merge into `main` publishes to Cloudflare Pages automatically.
+
+The one thing a ruleset cannot enforce is itself: whoever owns the repository
+can always edit or remove it. Separation of duties comes from who holds which
+account, not from this file — which is why the intent is that code is authored
+by one identity and approved by another.
+
 ## Where the claims on this site come from
 
 Almost everything here describes software that lives in **another repository**.
