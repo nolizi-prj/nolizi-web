@@ -31,6 +31,7 @@ const REQUIRED_TOKENS = [
   "--border", "--border-strong", "--rule",
   "--shadow-sm", "--shadow", "--shadow-lg",
   "--ease", "--duration", "--focus-ring", "--focus-offset",
+  "--mark-size",
 ];
 
 test("the theme defines every token the structural layer consumes", async () => {

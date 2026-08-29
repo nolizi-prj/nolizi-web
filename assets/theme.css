@@ -60,16 +60,20 @@
   --font-display: var(--font-mono);
   --font-body:    var(--font-mono);
 
-  /* Monospace runs large on the page, so every step is a notch smaller and
-   * the leading is looser than a proportional face would need. */
-  --text-xs:   0.6875rem;
-  --text-sm:   0.75rem;
-  --text-base: clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
-  --text-md:   clamp(0.875rem, 0.85rem + 0.16vw, 0.9375rem);
-  --text-lg:   clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --text-xl:   clamp(1.1875rem, 1.1rem + 0.4vw, 1.4375rem);
-  --text-2xl:  clamp(1.4375rem, 1.28rem + 0.8vw, 1.9rem);
-  --text-3xl:  clamp(1.75rem, 1.4rem + 1.8vw, 2.75rem);
+  /* Monospace has a large x-height and wide advance, which reads as "big" on
+   * the page even when it is small in points — so an earlier version of this
+   * scale trimmed every step. That was a mistake: it looked balanced in a
+   * screenshot and was tiring to actually read. Body text is now 15-16px, the
+   * same as a proportional face would use, and the small end stops at 12px
+   * because 11px metadata is decoration, not information. */
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: clamp(0.9375rem, 0.91rem + 0.14vw, 1rem);
+  --text-md:   clamp(1rem, 0.97rem + 0.16vw, 1.0625rem);
+  --text-lg:   clamp(1.125rem, 1.08rem + 0.24vw, 1.25rem);
+  --text-xl:   clamp(1.375rem, 1.29rem + 0.42vw, 1.625rem);
+  --text-2xl:  clamp(1.75rem, 1.55rem + 0.95vw, 2.25rem);
+  --text-3xl:  clamp(2rem, 1.65rem + 1.8vw, 3rem);
 
   --leading-tight: 1.25;
   --leading-snug:  1.4;
@@ -79,8 +83,8 @@
   --tracking-caps:    0.1em;
   --weight-display:   600;
 
-  --measure: 60ch;
-  --measure-wide: 78ch;
+  --measure: 56ch;
+  --measure-wide: 72ch;
 
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
@@ -111,6 +115,7 @@
 
   --ease: steps(1, end);
   --duration: 1ms;
+  --mark-size: 2rem;
   --focus-ring: 2px solid var(--accent);
   --focus-offset: 2px;
 }
@@ -157,8 +162,17 @@ body { font-variant-ligatures: none; }
 
 .masthead { border-bottom: var(--border-strong); background: var(--paper); position: sticky; top: 0; z-index: 5; }
 .wordmark { color: var(--ink-strong); }
-.wordmark-name { font-size: 0.9375rem; font-weight: 700; letter-spacing: 0.04em; text-transform: lowercase; }
-.wordmark-name::before { content: "$ "; color: var(--accent); font-weight: 400; }
+/* No "$" prompt. It made the wordmark read as a shell command, which also
+ * forced the lowercase — remove one and the other loses its reason. Set as a
+ * wordmark instead: uppercase, tracked, and large enough to be the first thing
+ * seen rather than a label above the navigation. */
+.wordmark-name {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  line-height: 1;
+}
 .wordmark-tagline { color: var(--ink-faint); font-size: var(--text-xs); padding-left: var(--space-2xs); margin-left: var(--space-3xs); }
 .wordmark-tagline::before { content: "// "; color: var(--line-strong); }
 

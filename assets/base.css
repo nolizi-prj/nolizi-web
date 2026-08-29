@@ -124,7 +124,7 @@ main { display: block; padding-block: var(--space-lg) var(--space-2xl); }
   text-decoration: none;
   min-width: 0;
 }
-.wordmark .mark { flex: none; width: 1.75rem; height: 1.75rem; }
+.wordmark .mark { flex: none; width: var(--mark-size); height: var(--mark-size); }
 .wordmark-tagline { display: none; }
 
 .nav {
