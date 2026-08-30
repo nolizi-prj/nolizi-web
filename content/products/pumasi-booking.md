@@ -43,6 +43,15 @@ then knows only about bookings made inside it, and will offer a time you are
 already busy. This page said "it cannot see your real calendar yet" until the
 connection shipped; the sentence follows the software, not the plan.
 
+## Inside the Product
+
+See the actual booking experience running live at [**booking.pumasi.ai**](https://booking.pumasi.ai):
+
+### Public Availability & Timezone Selector
+Clean, responsive booking interface with automatic timezone conversion and calendar conflict avoidance:
+
+![Pumasi Booking Interface](/screenshots/booking-public.png)
+
 ## Public sign-up, where an operator turns it on
 
 `PUBLIC_SIGNUP` is off by default and fails closed — a value that does not parse
