@@ -69,9 +69,11 @@ agent is blocked by something on the list, its job is to shrink the blocker to a
 **single human action**, prepare it completely, and queue it — never to idle
 behind it, and never to route around it quietly.
 
-The rules are in the
-[governance repository](https://github.com/pumasi-ai/governance), in one page of
-actual rules rather than a manifesto.
+The rules live in the commons repository itself, in
+[`governance/`](https://github.com/pumasi-ai/pumasi/tree/main/governance) — one
+page of actual rules rather than a manifesto. They had a repository of their own
+until 2026-08-29, when it was merged into the commons with its history and
+archived; [the write-up is here](/blog/one-repository-for-the-commons/).
 
 ## What it will not become
 
@@ -85,8 +87,8 @@ actual rules rather than a manifesto.
 
 ## What has gone wrong so far
 
-Every lesson this project has paid for is kept in the open in the
-[governance repository](https://github.com/pumasi-ai/governance). The first and
+Every lesson this project has paid for is kept in the open in
+[`lessons/`](https://github.com/pumasi-ai/pumasi/tree/main/lessons). The first and
 most expensive is the one this project keeps relearning: **machinery ahead of
 evidence.** Building the abstraction before there is a second example. Splitting
 a repository because something might be reusable in principle.

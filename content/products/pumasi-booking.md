@@ -4,7 +4,7 @@ description: "A booking page people can send someone to pick a time on. Accounts
 compareTo: [Calendly, "Cal.com"]
 status: seed
 repo: "https://github.com/pumasi-ai/pumasi-booking"
-limitation: "it cannot see your real calendar yet, so it will offer a time you are already busy and confirm a booking on top of it."
+limitation: "no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
 order: 1
 updated: 2026-08-29
 ---
@@ -29,17 +29,35 @@ The invite appears **only while there are no accounts**. Once anyone has signed
 up it stops, even if asked for explicitly: an invite that keeps appearing is a
 back door. After that they are minted deliberately, from the CLI.
 
-## What it does not do yet
+## It can see your real calendar, once you connect one
 
-**It cannot see your real calendar.** The service knows only about bookings made
-inside it, so it will offer a time you are already busy and confirm a booking on
-top of it. Double-booking against your own calendar is the *expected* behaviour
-today, not a bug to report.
+Google and Microsoft 365 connections are read for busy times **before any slot
+is offered**, and read again at the moment of booking, so a commitment that
+appeared while someone was choosing still blocks the slot. It **fails closed**:
+while a connected calendar cannot be reached, the page refuses to offer times
+rather than risk booking over you. Cancellations and reschedules follow to the
+connected calendar.
 
-Calendar connection is the next item: Google first, reading busy times first,
-write-back as a separate optional grant later. Google and Microsoft are named as
-subprocessors before any token is held, and the connection token is treated as
-the most protected datum in the system.
+**Without provider credentials configured, nothing is connected.** The service
+then knows only about bookings made inside it, and will offer a time you are
+already busy. This page said "it cannot see your real calendar yet" until the
+connection shipped; the sentence follows the software, not the plan.
+
+## Public sign-up, where an operator turns it on
+
+`PUBLIC_SIGNUP` is off by default and fails closed — a value that does not parse
+is treated as absent. Where it is on, **sign-up never hands out a session on an
+unproven address**: creating an account mails a single-use link, and the session
+begins only when that link is used. An invite, or Google's verified email, is
+proof; a typed string is not. Sign-up answers identically whether an address is
+taken or free, so it cannot be used to find out who has an account, and it is
+rate-limited.
+
+Opening the hosted deployment at booking.pumasi.ai to public sign-up was a
+**can-hurt release** under the commons charter — the people exposed are bookers,
+who never chose this project. The published record is
+[the release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-29-pumasi-booking-public-signup.md),
+including what shipped first, what is still unknown, and what would reverse it.
 
 ## Where it stands legally
 
@@ -70,7 +88,7 @@ require one, write to `admin@pumasi.ai` before relying on this service for that
 data.
 
 Those two — the transfer mechanism and the review by counsel — are what remains
-of [`DEBT.md` D-105](https://github.com/pumasi-ai/governance/blob/main/governance/DEBT.md),
+of [`DEBT.md` D-105](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md),
 which is open, and was narrowed from blocking to degrading on 2026-08-29.
 
 **It does not report anything about itself.** The commons-wide reporting
@@ -79,7 +97,7 @@ is read into its configuration and then read by nothing, and no conformance or
 telemetry payload is ever sent. (Mail and calendar connections are a separate
 matter, and every third party that can see data is named in the subprocessor
 register.) That absence is a recorded decision —
-[`DEBT.md` D-108](https://github.com/pumasi-ai/governance/blob/main/governance/DEBT.md) —
+[`DEBT.md` D-108](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md) —
 taken knowingly, and named rather than papered over with a flag that pretends to
 work.
 
