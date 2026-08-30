@@ -73,7 +73,7 @@ The rules live in the commons repository itself, in
 [`governance/`](https://github.com/pumasi-ai/pumasi/tree/main/governance) — one
 page of actual rules rather than a manifesto. They had a repository of their own
 until 2026-08-29, when it was merged into the commons with its history and
-archived; [the write-up is here](/blog/one-repository-for-the-commons/).
+archived.
 
 ## What it will not become
 
@@ -100,4 +100,4 @@ keeping it true — this page said "seven" until there were nine.
 That last one is not hypothetical. The scheduling engine was given its own
 repository because someone might want it alone. Nobody did. The split cost two
 merge gates, two specification trees and an unpinned dependency until it was
-merged back — [written up here](/blog/one-product-one-repository/).
+merged back (documented in [L-001](https://github.com/pumasi-ai/pumasi/blob/main/lessons/L-001-premature-specialization-forks-the-narrative.md)).
