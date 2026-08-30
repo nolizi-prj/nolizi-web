@@ -10,7 +10,7 @@
     "name": "Pumasi",
     "github": "https://github.com/pumasi-ai",
     "catalog": "https://github.com/pumasi-ai/pumasi/blob/main/catalog.json",
-    "governance": "https://github.com/pumasi-ai/governance",
+    "governance": "https://github.com/pumasi-ai/pumasi/tree/main/governance",
     "email": "hello@pumasi.ai"
   },
   "nav": [

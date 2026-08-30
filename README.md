@@ -138,7 +138,7 @@ restatements fork.
 
 Six corrections in one day taught this the expensive way; the rule is recorded
 in the commons as
-[L-007](https://github.com/pumasi-ai/governance/blob/main/lessons/L-007-restating-a-rule-forks-it.md):
+[L-007](https://github.com/pumasi-ai/pumasi/blob/main/lessons/L-007-restating-a-rule-forks-it.md):
 
 > **Verify against the artefact, never against another document's claim about
 > it.** Count `cases.json`, run the suite, read `config.ts`, list the directory.

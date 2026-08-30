@@ -130,7 +130,7 @@ test("llms.txt indexes every page, with Markdown URLs", () => {
 test("llms-full.txt contains the actual prose of every page", () => {
   const full = byPath.get("llms-full.txt") as string;
   assert.ok(full.includes("The problem is duplication"), "home page body missing");
-  assert.ok(full.includes("It cannot see your real calendar"), "product body missing");
+  assert.ok(full.includes("read for busy times"), "product body missing");
   assert.ok(full.includes("per-seat tax") || full.includes("per employee per month"), "post body missing");
 });
 
@@ -181,12 +181,12 @@ test("the Markdown twin carries the canonical URL and the body", async () => {
   assert.match(twin, /^---\n/);
   assert.match(twin, /url: https:\/\/pumasi\.ai\/products\/pumasi-booking\//);
   assert.match(twin, /licence: Apache-2\.0/);
-  assert.ok(twin.includes("It cannot see your real calendar"));
+  assert.ok(twin.includes("read for busy times"));
 });
 
 test("a product states its limitation before its features", () => {
   const page = byPath.get("products/pumasi-booking/index.html") as string;
-  const limitation = page.indexOf("cannot see your real calendar");
+  const limitation = page.indexOf("no lawyer has reviewed its privacy pack");
   const firstHeading = page.indexOf("<h2");
   assert.ok(limitation > 0, "the limitation is not on the page at all");
   assert.ok(limitation < firstHeading, "the limitation appears after the first section");
