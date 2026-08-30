@@ -155,7 +155,7 @@ real boundary — purity, its own specification, its own acceptance suite — an
 that boundary is enforced by the code and its tests, not by a repository wall.
 It *was* a separate repository once; that cost two merge gates, two specification
 trees and an unpinned dependency in exchange for a reusability nobody had asked
-for. [The write-up is here](/blog/one-product-one-repository/).
+for (documented in [L-001](https://github.com/pumasi-ai/pumasi/blob/main/lessons/L-001-premature-specialization-forks-the-narrative.md)).
 
 The day someone wants the engine alone, `git subtree split --prefix=core` hands
 it over with its history intact.

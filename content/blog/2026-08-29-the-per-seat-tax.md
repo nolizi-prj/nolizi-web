@@ -32,6 +32,13 @@ rearranged in October 2025
 For a thirty-person restaurant on Deputy Core with HR and Messaging+, that is a
 little over $310 a month to answer the question *who is working Thursday*.
 
+| Platform | Base Pricing (Per User) | Gated Add-ons & Surcharges | Monthly Bill (30 Seats) | Annual Bill |
+| :--- | :--- | :--- | :--- | :--- |
+| **When I Work** | $2.50 – $8.00 / user / mo | SAML/SSO & API gated to Premium | $75.00 – $240.00 / mo | $900 – $2,880 / yr |
+| **Deputy** | $5.00 – $9.00 / user / mo | +$2.00 HR, +$1.95 Messaging, +$1.50 Analytics | $313.50 / mo | $3,762 / yr |
+| **Homebase** | $24.95 – $99.95 / location | +$3.00/user over limit + Payroll fees | $99.95 – $199.95 / mo | $1,200 – $2,400 / yr |
+| **Pumasi Commons** | **$0.00 (Unmetered)** | **Zero per-seat tax · Free Forever · Apache-2.0** | **$0.00 / mo** | **$0.00 / yr** |
+
 ## The public page and the trial disagree
 
 Here is the part worth the trial fee.
