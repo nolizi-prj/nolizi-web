@@ -4,7 +4,7 @@ description: "A booking page people can send someone to pick a time on. Accounts
 compareTo: [Calendly, "Cal.com"]
 status: beta
 repo: "https://github.com/pumasi-ai/pumasi-booking"
-limitation: "a reviewed fix for a live defect is merged but not deployed — booking.pumasi.ai is still serving the build from 2026-08-30 16:55 UTC, so a connected owner's Zoom personal meeting room is still printed on their public booking page. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
+limitation: "two reviewed fixes for live defects are merged but not deployed — booking.pumasi.ai is still serving the build from 2026-08-30 16:55 UTC, so a connected owner's Zoom personal meeting room is still printed on their public booking page, and no reminder, follow-up or webhook has ever been delivered on that deployment. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
 order: 1
 updated: 2026-08-31
 ---
@@ -53,7 +53,7 @@ the limit is stated in the product's own
 under claim C1). Self-host with your own credentials and the gate does not
 apply to you. This is one of the reasons the product is not `launched`.
 
-## Conferencing links, and a defect that is live right now
+## Conferencing links, reminders, and two defects that are live right now
 
 If you press "Connect with Zoom" on the deployment today, your Zoom **personal
 meeting room** — the one permanent room an account has — is pasted onto your
@@ -68,9 +68,10 @@ which rather than letting the repository take credit for the product:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
-| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 at 21:34 UTC |
+| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 at 22:04 UTC |
 | Personal meeting room on the public page | removed | **still printed — the leak is live** |
 | Per-booking room, created at booking time | yes | no |
+| Reminders, follow-ups and webhooks | sent when due | **never sent — not one, since the feature shipped 2026-08-28** |
 | Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
 
 Nothing carried the reviewed build to the worker, and that gap is structural
@@ -143,8 +144,58 @@ repository; for them merged genuinely is the delivery mechanism, once they pull.
 **Neither of them touches the Zoom leak above, which is still live.** Nothing in
 either release goes near it, and nothing has been deployed since:
 `npx wrangler deployments list` still puts the last deployment of this worker at
-**2026-08-30 16:55:37 UTC** — re-measured 2026-08-31 at 21:34 UTC, and it had not
+**2026-08-30 16:55:37 UTC** — re-measured 2026-08-31 at 22:04 UTC, and it had not
 moved — and `booking.pumasi.ai` answers that build today.
+
+### The second defect: reminders, follow-ups and webhooks have never been sent on the hosted deployment
+
+Pumasi Booking sells timed messages — a reminder the day before, a follow-up
+afterwards — and webhooks that tell another system when someone books, cancels
+or reschedules. **On `booking.pumasi.ai`, none of them has ever been
+delivered.** Not one reminder, not one follow-up, not one webhook, since the
+feature shipped on 2026-08-28.
+
+They were not delayed, and no mail provider dropped them. **They were never
+attempted.** Everything timed goes onto a queue and a timer drains it; on the
+hosted build that timer threw on its first line of real work, and it died on
+the line *before* the one that schedules its next wake-up — so it never woke
+again either. Booking itself is untouched: a booking still confirms, and the
+confirmation you get at the moment of booking goes out on the request path
+rather than through the queue, so that one arrives.
+
+**This defect is the mirror image of the OAuth-callback and sign-in fixes
+above, and the asymmetry is the part worth carrying away.** Those two cannot
+occur on `booking.pumasi.ai` at all, and the people they broke are
+self-hosters, for whom merged really is delivery. This one is the reverse: it
+can occur **only** on the hosted Cloudflare build. If you run Pumasi Booking
+yourself on the Node server, you were never affected — that entry point
+imported the function it calls, throughout. The hosted entry point did not, and
+the tool that bundles it strips types without reading them, so a missing import
+bundled cleanly and shipped. For this defect, self-hosting is what protected
+you.
+
+**The fix is merged and it is not deployed**, on the same open Q-012 as
+everything else on this page, and the deployment measurement above is the whole
+answer: nothing has moved, so your reminders and webhooks are still not being
+sent. When someone does deploy, anything still queued for a future time is
+delivered normally; nothing whose moment has already passed is sent late, which
+is deliberate — a follow-up for a meeting three days ago would be noise rather
+than service.
+
+**How it was found, and what is not being claimed.** Nobody reported this. The
+issue tracker holds nothing about it, and that is the shape of the failure
+rather than a detail of it: a reminder that never arrives does not look like an
+error to the person waiting for it. It was found by running the type-check that
+nothing in the project ran automatically — the check the engine section below
+describes. And the evaluation that found it **did not** exercise a workflow against the live
+deployment; doing that would mean booking against a real owner's page. The
+finding rests on the source, on the bundle that would ship, and on the path
+that arms the timer, each checked separately and written down in
+[`roadmap/BACKLOG.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/roadmap/BACKLOG.md).
+[The release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-alarm-import.md)
+is a can-hurt note under
+[Q-029](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md), veto window
+to 2026-09-07.
 
 ## Inside the Product
 
@@ -277,9 +328,21 @@ other half: **the run states what it did not check, every time it runs.** It
 names `service/test/browser-live.test.ts` — excluded from that one run because
 it drives the live `booking.pumasi.ai` and would go red for a third party's
 reasons — and the script *fails* if that file is not in the suite, so the
-exclusion cannot quietly become a lie the day someone renames a test. It reads
-both `service` tsconfigs at run time and reports that the deployed entry point,
-`src/worker.ts`, is type-checked by neither. And switching it on is what found
+exclusion cannot quietly become a lie the day someone renames a test. And the
+same paragraph you are reading has since had to be corrected, which is the
+better demonstration: the run used to report that **nothing** in the repository
+type-checked the deployed entry point, `src/worker.ts`. Something does now, and
+the run stopped saying otherwise without anyone editing that sentence into it:
+it *discovers* the `service` tsconfigs at run time and reads each one, rather
+than consulting a list written down on the day the gap was found, and
+[`tools/ci.sh`](https://github.com/pumasi-ai/pumasi-booking/blob/main/tools/ci.sh)
+says why in a comment at the spot where it would have gone wrong: *"a hardcoded
+pair would have gone on saying nothing checks the worker while something did."*
+**The check the run confessed was missing is the check that got built**, and the
+confession retired itself. What stands in its place is narrower and worth
+reading before you trust the file: `src/worker.ts` is now type-checked, and a
+test executes its alarm handler — but no run there exercises its router, and
+nothing in that script runs `workerd`. Switching CI on is also what found
 that the root type-check had been skipping the whole `service/` workspace —
 every line that touches HTTP, PostgreSQL, mail and sessions — while exiting
 `0`; that is now closed, with the workspace passing as it already stood.
