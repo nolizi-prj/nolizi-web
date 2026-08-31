@@ -1,6 +1,6 @@
 ---
 title: "Why we show the seams: building in the open before the product is stable"
-description: "Pumasi Booking is in seed stage and not yet stable. Here is why we publish the open debts, list the limitations at the top of the page, and invite testing on the pure engine first."
+description: "Why we publish the open debts, list the limitations at the top of the page, and test on the pure engine first. Written at seed stage; Pumasi Booking is beta now, and a dated note says so."
 date: 2026-08-29
 tags: [engineering, philosophy, transparency, governance]
 author: "Pumasi"
@@ -13,6 +13,18 @@ We are taking the opposite approach with **Pumasi Booking**.
 The product is in **seed stage**, under active construction, and not yet stable. If you deploy it expecting a mature, five-year-old enterprise SaaS replacement today, you will find edges that are still being sanded down. 
 
 Instead of hiding those seams, we put them at the very top of the page. Here is why.
+
+> **Update, 2026-08-31.** The stage sentence above was true the day this was
+> published and is no longer. Pumasi Booking's
+> [`STAGE.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/roadmap/STAGE.md)
+> has said **`beta`** since 2026-08-29 — strangers can rely on it, the known
+> gaps are listed, data survives — and it is re-justified at each release
+> evaluation rather than left to drift. The argument below is unchanged; only
+> the label moved. The current stage, and the limitations that come with it,
+> are on the [product page](/products/pumasi-booking/), which is the surface
+> that tracks the roadmap. This post is left as it was written rather than
+> quietly edited, because a dated argument that gets retconned is worth less
+> than one that carries its own correction.
 
 ---
 
