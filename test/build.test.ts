@@ -198,6 +198,35 @@ test("a product twin claims a product licence only when its card states one", as
   assert.match(tunnel, /product_licence: "Apache-2\.0"/);
 });
 
+test("a priced claim about someone else's product carries the date we read it", () => {
+  // The rule that removed the Adobe Sign and PandaDoc rows from the DocuSign
+  // post: a dollar figure attributed to an outside vendor is publishable only
+  // with the date someone here opened that vendor's page. The DocuSign row of
+  // exactly this shape was wrong at both ends until it was re-read, so the
+  // date is the load-bearing part of the citation, not decoration.
+  //
+  // Keyed off the citation link rather than a list of vendor names, so a row
+  // for a vendor nobody has thought of yet is covered the day it lands.
+  //
+  // The date may sit on the row itself or in the prose introducing the table
+  // it belongs to — dating a whole table once is the better habit, not a
+  // weaker one — so the window below covers the priced line and its lead-in.
+  const external = /\[[^\]]*\]\(https?:\/\/(?!(?:www\.)?pumasi\.(?:ai|link))[^)]+\)/;
+  const amount = /\$\s?\d/;
+  const readDate = /(?:read|fetched)[^.\n]{0,60}?\d{4}-\d{2}-\d{2}/;
+  const LEAD_IN = 10;
+
+  for (const file of files.filter((f) => f.path.endsWith(".md"))) {
+    const lines = file.contents.split("\n");
+    lines.forEach((line, i) => {
+      if (!external.test(line) || !amount.test(line)) return;
+      const block = lines.slice(Math.max(0, i - LEAD_IN), i + 1).join("\n");
+      assert.match(block, readDate,
+        `${file.path} prices an outside vendor without a read date:\n${line}`);
+    });
+  }
+});
+
 test("a product states its limitation before its features", () => {
   const page = byPath.get("products/pumasi-booking/index.html") as string;
   const limitation = page.indexOf("no lawyer has reviewed its privacy pack");

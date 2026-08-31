@@ -1,6 +1,6 @@
 ---
-title: "Why does sending a 500KB PDF cost $50 a month? The DocuSign tax and pure-edge stamping"
-description: "E-signature incumbents charge $40/seat/mo and meter document envelopes. How pure TypeScript stamping and Cloudflare Durable Objects turn contract execution into an unmetered commodity."
+title: "Why does sending a 500KB PDF cost $45 a month? The DocuSign tax and pure-edge stamping"
+description: "DocuSign's own page prices Business Pro at $45/user/mo and meters 100 envelopes/user/yr. How pure TypeScript stamping and Cloudflare Durable Objects make contract execution an unmetered commodity."
 date: 2026-08-30
 tags: [engineering, architecture, pricing, e-signature, cloudflare]
 author: "Pumasi"
@@ -14,7 +14,7 @@ Yet incumbents have turned this basic computer science primitive into one of the
 
 ## 1. The Incumbent Business Model: Artificial Scarcity
 
-DocuSign, Adobe Sign, and PandaDoc do not sell compute or storage. They sell **artificial envelope scarcity**.
+DocuSign does not sell compute or storage. It sells **artificial envelope scarcity**.
 
 ```
                 ┌─────────────────────────────────────────────────────────┐
@@ -40,19 +40,30 @@ Let us look at published pricing vs. the real invoices small-to-medium businesse
 | Provider | Published Tier (Per User) | Monthly Allowance | Gated Features | Annual Cost (20 Users) |
 | :--- | :--- | :--- | :--- | :--- |
 | **DocuSign** ([Pricing](https://ecom.docusign.com/plans-and-pricing/esignature), read 2026-08-31) | **$30 – $45** / user / mo (Standard, Business Pro; annual billing) | **100 envelopes / user / yr**, as shown on both plans | Reusable templates, signer attachments, SSO gated to Enterprise | **$7,200 – $10,800** / yr |
-| **Adobe Sign** ([Pricing](https://www.adobe.com/sign/pricing.html)) | **$22 – $45** / user / mo | Capped per seat pool | Custom branding, bulk send, audit trail exports gated | **$5,280 – $10,800** / yr |
-| **PandaDoc** ([Pricing](https://www.pandadoc.com/pricing/)) | **$19 – $49** / user / mo | Unlimited on higher tier | Template sharing & custom branding gated to Business tier ($49/mo) | **$4,560 – $11,760** / yr |
 | **Pumasi Sign** ([pumasi.ai](https://pumasi.ai/products/pumasi-sign/)) | **$0.00 (Unmetered)** | **Unlimited Envelopes** | **All features included · Custom Branding.** Licence: the repository carries no `LICENSE` file yet — see the product page | **$0.00 / yr** |
 
-**On the sourcing of that table, because it has been corrected once.** The
+**On the sourcing of that table, because it has been corrected twice.** The
 DocuSign row was re-read from the vendor's own pricing page on **2026-08-31**
-and now matches `pumasi-sign`
+and matches `pumasi-sign`
 [`roadmap/MARKET.md` §1](https://github.com/pumasi-ai/pumasi-sign/blob/main/roadmap/MARKET.md);
-it previously read "$25 – $40", which was wrong at both ends. **The Adobe Sign
-and PandaDoc rows carry this post's original figures and have not been
-re-verified since publication** — treat them as of 2026-08-30 and prefer their
-linked pricing pages over this summary. Prices move, and the date is part of
-the claim.
+it previously read "$25 – $40", which was wrong at both ends.
+
+**This table used to carry an Adobe Sign row and a PandaDoc row. They have been
+removed rather than restated.** They held this post's original figures, which
+nobody here had read from either vendor. Neither vendor appears in any product
+repository's `MARKET.md`, so there was no owned source to check them against,
+and on **2026-08-31** both vendors' own pricing pages refused to serve us a
+price: `adobe.com/sign/pricing.html` returned no response body over repeated
+requests, and `pandadoc.com/pricing/` answered `HTTP 429` behind a JavaScript
+bot challenge. An unread number is not a weaker citation than a read one; it is
+not a citation. The two annual columns derived from those rows are gone with
+them, because arithmetic on an unverified figure reads as more precise than its
+input, not less.
+
+The measured reason to distrust the dropped rows is the row beside them: the
+DocuSign figures of exactly that provenance were wrong at **both** ends when
+someone finally opened the page. Prices move, and the date is part of the
+claim.
 
 When a growing business hires 5 new team members on the Standard plan, their
 e-signature bill increases by $150 per month — even if those employees send one
@@ -76,7 +87,7 @@ Under the US **Electronic Signatures in Global and National Commerce Act** ([15 
 3. **Association of Signature with Record**: The signature data must be deterministically stamped and tethered to the exact document bytes.
 4. **Tamper-Evident Retention**: An audit certificate recording timestamps, IP addresses, user agents, and cryptographic digests proving the document was not altered post-execution.
 
-None of these requirements require a $50/month per-seat subscription. They require standard cryptography (`SHA-256`) and deterministic coordinate geometry.
+None of these requirements require a $45/user/month per-seat subscription. They require standard cryptography (`SHA-256`) and deterministic coordinate geometry.
 
 ---
 
@@ -147,7 +158,12 @@ Because the coordinate translation is a pure mathematical projection, the result
 
 When the infrastructure cost of executing an agreement drops to near zero, the business model must change.
 
-Pumasi Sign is licensed **Apache-2.0**. It has no envelope meters, no per-seat paywalls, and no gated features:
+Pumasi Sign has no envelope meters, no per-seat paywalls, and no gated
+features. It is **not yet licensed**: as of **2026-08-31** the repository
+carries no `LICENSE` file on its default branch — checked with
+`gh api repos/pumasi-ai/pumasi-sign/contents/LICENSE`, which returns `404`, and
+neither its `package.json` nor its README declares one. Read the source and run
+it, but until that file lands nobody here has granted you a licence to it:
 - Run it locally or self-host on your own Cloudflare account: `git clone https://github.com/pumasi-ai/pumasi-sign && npx wrangler deploy`.
 - Use the public commons deployment at [**https://sign.pumasi.ai**](https://sign.pumasi.ai) with your own custom branding.
 
