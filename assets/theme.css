@@ -249,6 +249,10 @@ body { font-variant-ligatures: none; }
   background: var(--warn-soft); color: var(--warn);
 }
 .badge::before { content: "["; } .badge::after { content: "]"; }
+/* The stage ladder. seed and alpha inherit .badge's provisional (warn) styling
+   rather than restating it; beta has earned a step away from that and is not
+   yet stable. */
+.badge-beta { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
 .badge-stable { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
 .badge-planned { border-color: var(--line-strong); background: var(--paper-sunken); color: var(--ink-muted); }
 .tag { font-size: var(--text-xs); color: var(--ink-muted); border: var(--border); background: var(--paper-sunken); padding: 0.12em 0.5em; }

@@ -2,11 +2,11 @@
 title: "Pumasi Booking"
 description: "A booking page people can send someone to pick a time on. Accounts, a public page, confirmation mail, management links. Apache-2.0."
 compareTo: [Calendly, "Cal.com"]
-status: seed
+status: beta
 repo: "https://github.com/pumasi-ai/pumasi-booking"
-limitation: "no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
+limitation: "a reviewed fix for a live defect is merged but not deployed — booking.pumasi.ai is still serving the build from 2026-08-30 16:55 UTC, so a connected owner's Zoom personal meeting room is still printed on their public booking page. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
 order: 1
-updated: 2026-08-29
+updated: 2026-08-31
 ---
 
 ## Run it
@@ -42,6 +42,57 @@ connected calendar.
 then knows only about bookings made inside it, and will offer a time you are
 already busy. This page said "it cannot see your real calendar yet" until the
 connection shipped; the sentence follows the software, not the plan.
+
+**On the hosted deployment this holds in full only for test users.** The Google
+OAuth application has not been submitted for verification, so on
+booking.pumasi.ai only nominated test accounts can connect a Google calendar —
+a stranger cannot yet
+([`GOOGLE-SETUP.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/service/spec/0003/GOOGLE-SETUP.md);
+the limit is stated in the product's own
+[`VALUE.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/roadmap/VALUE.md)
+under claim C1). Self-host with your own credentials and the gate does not
+apply to you. This is one of the reasons the product is not `launched`.
+
+## Conferencing links, and a defect that is live right now
+
+If you press "Connect with Zoom" on the deployment today, your Zoom **personal
+meeting room** — the one permanent room an account has — is pasted onto your
+public booking page, where anyone who opens that page can read it and walk in.
+They do not have to book, prove an email address, or be invited. The same paste
+also suppressed the per-booking room the card beside the button promised.
+
+**The fix is merged, reviewed and gate-passed — and it is not deployed: the
+build serving `booking.pumasi.ai` today is the one without it.** The repository
+and the deployment are two different things here, and this page says which is
+which rather than letting the repository take credit for the product:
+
+| | `main`, the repository | `booking.pumasi.ai`, what you can use today |
+|---|---|---|
+| Build | `16c3fd4`, 2026-08-31 05:27 UTC | last deployed **2026-08-30 16:55 UTC** |
+| Personal meeting room on the public page | removed | **still printed — the leak is live** |
+| Per-booking room, created at booking time | yes | no |
+| Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
+
+Nothing carried the reviewed build to the worker, and that gap is structural
+rather than an oversight: the charter's flow ends at a published release note,
+and no role owns deployment. It is open as
+[`DECISIONS.md` Q-012](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
+and the deploy sits at the top of
+[`BACKLOG.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/roadmap/BACKLOG.md)
+as item 1, marked operator action rather than a build.
+
+What changed in `main` is written up in full — including what was deliberately
+*not* changed, and what could still hurt someone — in
+[the release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-zoom-connect.md)
+(a can-hurt release under the charter; the charter's seven-day veto window
+runs to 2026-09-07, which the steward has yet to confirm —
+[Q-011](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)). That note
+is written in the present tense and describes the branch. **Until the deploy
+happens, read every sentence in it as true of the repository and not of the
+page you can open.**
+
+If you have connected Zoom to the hosted deployment, pressing **Disconnect**
+removes the stored link now, without waiting for the deploy.
 
 ## Inside the Product
 
@@ -100,15 +151,28 @@ Those two — the transfer mechanism and the review by counsel — are what rema
 of [`DEBT.md` D-105](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md),
 which is open, and was narrowed from blocking to degrading on 2026-08-29.
 
-**It does not report anything about itself.** The commons-wide reporting
-described in `REPORTING.md` is not implemented in this service: `PUMASI_REPORTING`
-is read into its configuration and then read by nothing, and no conformance or
-telemetry payload is ever sent. (Mail and calendar connections are a separate
-matter, and every third party that can see data is named in the subprocessor
-register.) That absence is a recorded decision —
-[`DEBT.md` D-108](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md) —
-taken knowingly, and named rather than papered over with a flag that pretends to
-work.
+**It can now report about itself — and on the deployment it still sends
+nothing.** The mechanism shipped 2026-08-30
+([release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-30-pumasi-booking-reporting-path.md)):
+a daily operating report about the software, never about the people who use it,
+and a conformance report an operator may choose to publish, signed, and never
+sent automatically. One switch turns all of it off — `PUMASI_REPORTING=false` —
+the software behaves identically afterwards, every start says out loud whether
+reporting is on and names that switch, and one command prints byte-for-byte what
+would be sent before anything goes.
+
+Two things that sentence must not be read to cover. **On the Cloudflare Workers
+build — the one serving booking.pumasi.ai — the mechanism is not wired in and
+nothing is sent at all**; the live privacy page says so per path. And **there is
+nothing to receive reports yet**: the documented intake is not live, so a send
+today fails, is logged, and is dropped. Nothing is retained anywhere. The
+retention promise is published (twelve months for operating reports, deletion on
+request to `admin@pumasi.ai`, reaching backups within 30 days), which closed half
+of [`DEBT.md` D-107](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md);
+that entry stays open until the intake exists with its deletion path implemented
+and tested. D-108, which recorded the absence of any mechanism, closed
+2026-08-30. Mail and calendar connections are a separate matter, and every third
+party that can see data is named in the subprocessor register.
 
 ### The ceilings are defaults, not a refusal
 
