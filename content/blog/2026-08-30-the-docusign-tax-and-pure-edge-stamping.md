@@ -18,16 +18,18 @@ DocuSign, Adobe Sign, and PandaDoc do not sell compute or storage. They sell **a
 
 ```
                 ┌─────────────────────────────────────────────────────────┐
-                │          THE $4,800/YEAR DOCUSIGN TOLLBOOTH             │
-                │    20 Employees · 100 Contracts/Month · Reusable Docs   │
+                │        THE $7,200/YEAR DOCUSIGN TOLLBOOTH               │
+                │   20 Employees · Standard plan · annual billing         │
+                │   Figures read from DocuSign's own page, 2026-08-31     │
                 └───────────────────────────┬─────────────────────────────┘
                                             │
         ┌───────────────────────────────────┼───────────────────────────────────┐
         ▼                                   ▼                                   ▼
 ┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
-│ Per-Seat Tax          │       │ Envelope Metering     │       │ Gated SSO & Branding  │
-│ $25 – $40 / user / mo │       │ Overage: $3 – $7 / doc│       │ Enterprise Tier Only  │
-│ ($6,000 – $9,600 / yr)│       │ Caps at 5–10 docs/mo  │       │ +$10,000 / yr minimum │
+│ Per-Seat Tax          │       │ Envelope Metering     │       │ Above Business Pro    │
+│ $30 – $45 / user / mo │       │ 100 envelopes / user  │       │ "Enhanced Plans"      │
+│ Standard · Bus. Pro   │       │ / year, both plans    │       │ price not published — │
+│ ($7,200–$10,800 / yr) │       │ Personal: 5 / month   │       │ "contact sales"       │
 └───────────────────────┘       └───────────────────────┘       └───────────────────────┘
 ```
 
@@ -37,12 +39,24 @@ Let us look at published pricing vs. the real invoices small-to-medium businesse
 
 | Provider | Published Tier (Per User) | Monthly Allowance | Gated Features | Annual Cost (20 Users) |
 | :--- | :--- | :--- | :--- | :--- |
-| **DocuSign** ([Pricing](https://www.docusign.com/products-and-pricing)) | **$25 – $40** / user / mo | Capped (often ~100 env/yr) | Reusable templates, signer attachments, SSO gated to Enterprise | **$6,000 – $9,600** / yr |
+| **DocuSign** ([Pricing](https://ecom.docusign.com/plans-and-pricing/esignature), read 2026-08-31) | **$30 – $45** / user / mo (Standard, Business Pro; annual billing) | **100 envelopes / user / yr**, as shown on both plans | Reusable templates, signer attachments, SSO gated to Enterprise | **$7,200 – $10,800** / yr |
 | **Adobe Sign** ([Pricing](https://www.adobe.com/sign/pricing.html)) | **$22 – $45** / user / mo | Capped per seat pool | Custom branding, bulk send, audit trail exports gated | **$5,280 – $10,800** / yr |
 | **PandaDoc** ([Pricing](https://www.pandadoc.com/pricing/)) | **$19 – $49** / user / mo | Unlimited on higher tier | Template sharing & custom branding gated to Business tier ($49/mo) | **$4,560 – $11,760** / yr |
-| **Pumasi Sign** ([pumasi.ai](https://pumasi.ai/products/pumasi-sign/)) | **$0.00 (Unmetered)** | **Unlimited Envelopes** | **All features included · Custom Branding · Apache-2.0** | **$0.00 / yr** |
+| **Pumasi Sign** ([pumasi.ai](https://pumasi.ai/products/pumasi-sign/)) | **$0.00 (Unmetered)** | **Unlimited Envelopes** | **All features included · Custom Branding.** Licence: the repository carries no `LICENSE` file yet — see the product page | **$0.00 / yr** |
 
-When a growing business hires 5 new team members, their e-signature bill increases by $150 to $200 per month—even if those employees send only one offer letter a quarter.
+**On the sourcing of that table, because it has been corrected once.** The
+DocuSign row was re-read from the vendor's own pricing page on **2026-08-31**
+and now matches `pumasi-sign`
+[`roadmap/MARKET.md` §1](https://github.com/pumasi-ai/pumasi-sign/blob/main/roadmap/MARKET.md);
+it previously read "$25 – $40", which was wrong at both ends. **The Adobe Sign
+and PandaDoc rows carry this post's original figures and have not been
+re-verified since publication** — treat them as of 2026-08-30 and prefer their
+linked pricing pages over this summary. Prices move, and the date is part of
+the claim.
+
+When a growing business hires 5 new team members on the Standard plan, their
+e-signature bill increases by $150 per month — even if those employees send one
+offer letter a quarter.
 
 ---
 

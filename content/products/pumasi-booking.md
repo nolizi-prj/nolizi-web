@@ -1,6 +1,6 @@
 ---
 title: "Pumasi Booking"
-description: "A booking page people can send someone to pick a time on. Accounts, a public page, confirmation mail, management links. Apache-2.0."
+description: "A booking page people can send someone to pick a time on. Accounts, a public page, confirmation mail, management links. Beta; no licence file yet."
 compareTo: [Calendly, "Cal.com"]
 status: beta
 repo: "https://github.com/pumasi-ai/pumasi-booking"

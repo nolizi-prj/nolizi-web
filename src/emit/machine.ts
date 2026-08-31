@@ -102,7 +102,16 @@ export function renderMarkdownTwin(site: SiteConfig, doc: RenderedDoc): string {
   }
   if (doc.matter.status) lines.push(`maturity: ${doc.matter.status}`);
   if (doc.matter.limitation) lines.push(`known_limitation: ${quote(String(doc.matter.limitation))}`);
-  lines.push(`licence: ${doc.matter.licence ?? "Apache-2.0"}`);
+  // Two different licences can be in play on one page, and conflating them is
+  // how a card ends up granting rights nobody granted. `content_licence` is the
+  // licence of THIS DOCUMENT as part of pumasi.ai — always the site's own, and
+  // always true. A product's licence is a fact about somebody else's
+  // repository, so it is emitted only when that product's card states one, and
+  // a product whose repository carries no LICENSE file simply has no such line.
+  lines.push(`content_licence: ${site.licence}`);
+  if (doc.matter.productLicence) {
+    lines.push(`product_licence: ${quote(String(doc.matter.productLicence))}`);
+  }
   lines.push("---");
   lines.push("");
   lines.push(`# ${doc.matter.title}`);
