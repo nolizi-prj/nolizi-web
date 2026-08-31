@@ -1,0 +1,261 @@
+/*
+ * Pumasi — the product application layer.
+ * =================================================================
+ * Load order, and it matters:
+ *
+ *     <link rel="stylesheet" href="https://pumasi.ai/theme.css">
+ *     <link rel="stylesheet" href="https://pumasi.ai/base.css">
+ *     <link rel="stylesheet" href="https://pumasi.ai/brand/product-theme.css">
+ *     <body data-product="sign">      <!-- or booking, or tunnel -->
+ *
+ * WHAT THIS FILE IS FOR. pumasi.ai is a document: prose, records, a listing.
+ * Pumasi Sign is a signing canvas with a field inspector; Pumasi Booking is a
+ * calendar grid; Pumasi Tunnel is a request log. Those are applications, and
+ * three things that are right for a document are wrong for one:
+ *
+ *   1. Monospace body text. Correct for a page of prose set at 56 characters;
+ *      expensive in a 40-row table, where the wide advance costs real columns.
+ *      So `--font-body` moves to the proportional stack and `--font-display`
+ *      does NOT — headings, labels and every number stay in the console face.
+ *      The brand lives where the eye lands first and the density lives in the
+ *      rows.
+ *   2. Zero elevation. Correct when nothing overlaps; wrong the moment a menu
+ *      opens over a table, because a dropdown that does not look like it is
+ *      floating reads as part of the row beneath it. The same four elevation
+ *      steps the commons already names are re-expressed here as real shadows.
+ *      No new token, no second scale.
+ *   3. Instant transitions. `steps(1, end)` at 1ms is a deliberate refusal of
+ *      animation on a static page. An application needs to show that a toast
+ *      arrived and a panel opened, so the duration becomes real — and stays
+ *      short enough that nobody waits for it.
+ *
+ * WHAT DOES NOT CHANGE, and this is the whole point of the file: the palette,
+ * the type SCALE, the spacing scale, the square corner, the 1px border, the
+ * stage badge, the button hierarchy, and `--accent` — which is green in every
+ * Pumasi surface that exists. A product is identified by `--signal`, which
+ * `theme.css` binds from `data-product`, and a signal never colours a control.
+ * The thing you click is the same colour in all three products. That is the
+ * fragmentation fix; everything else here is detail.
+ *
+ * Licence: Apache-2.0.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* 1 — density. Headings stay monospace on purpose; see the note above. A
+   * product that wants proportional headings too overrides one line. */
+  --font-body: var(--font-ui);
+
+  /* 2 — elevation, as the same four steps. Shadows are tuned on the ink
+   * colour rather than pure black: a black shadow on a warm paper reads as
+   * dirt. Step 3 is for one thing at a time — a modal, and nothing else. */
+  --elev-1: 0 1px 2px rgba(10, 10, 9, 0.05);
+  --elev-2: 0 1px 2px rgba(10, 10, 9, 0.05), 0 2px 6px rgba(10, 10, 9, 0.05);
+  --elev-3: 0 2px 4px rgba(10, 10, 9, 0.06), 0 12px 28px rgba(10, 10, 9, 0.12);
+  --elev-1-border: var(--border);
+  --elev-2-border: var(--border);
+  --elev-3-border: var(--border-strong);
+
+  /* 3 — motion that a person can see without waiting for it. */
+  --duration: 120ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Application-only geometry. The row height is a token because a calendar
+   * cell, a table row and a select option have to agree or the eye finds the
+   * seam immediately. */
+  --row-h: 2.5rem;
+  --control-h: 2.25rem;
+  --panel-w: 20rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* A shadow does not read on a dark ground — the ink is already darker
+     * than any shade. Elevation in dark is carried by the border and by the
+     * raised ground, which is why those two are restated and the blurs are
+     * kept but shallow, for the modal case only. */
+    --elev-1: none;
+    --elev-2: none;
+    --elev-3: 0 16px 40px rgba(0, 0, 0, 0.55);
+    --elev-1-border: var(--border);
+    --elev-2-border: var(--border-strong);
+    --elev-3-border: 1px solid var(--line-strong);
+  }
+}
+
+/* ===================================================================
+ * Form controls. The commons has no form, so this is additive: nothing
+ * below overrides a rule in theme.css.
+ * =================================================================== */
+
+.field { display: grid; gap: var(--space-3xs); margin-bottom: var(--space-sm); }
+.field > label {
+  font-family: var(--font-display);
+  font-size: var(--text-xs); text-transform: uppercase;
+  letter-spacing: var(--tracking-caps); color: var(--ink-muted);
+  font-weight: var(--weight-strong);
+}
+.field > .hint { font-size: var(--text-xs); color: var(--ink-faint); }
+.field > .error { font-size: var(--text-xs); color: var(--danger); }
+
+.input, .select, .textarea {
+  font: inherit; font-size: var(--text-sm);
+  min-height: var(--control-h);
+  padding: var(--space-3xs) var(--space-2xs);
+  background: var(--paper-raised); color: var(--ink-strong);
+  border: var(--control-line); border-radius: var(--radius);
+  width: 100%;
+}
+/* An input whose focus ring is its border moves the layout by a pixel when it
+ * is focused. The ring is an outline, which does not take space. */
+.input:focus-visible, .select:focus-visible, .textarea:focus-visible {
+  border-color: var(--accent); outline: var(--focus-ring); outline-offset: var(--focus-offset);
+}
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.input:disabled, .select:disabled, .textarea:disabled {
+  background: var(--paper-sunken); color: var(--ink-faint); cursor: not-allowed;
+}
+.input::placeholder { color: var(--ink-faint); }
+
+/* A code input — an OTP box, an API token, a subdomain — is monospace whatever
+ * the body face is, because the reader is checking it character by character. */
+.input-code { font-family: var(--font-mono); letter-spacing: 0.12em; }
+
+/* ===================================================================
+ * Surfaces that overlap. The only place elevation is spent.
+ * =================================================================== */
+
+.panel {
+  background: var(--elev-1-ground); border: var(--elev-1-border);
+  box-shadow: var(--elev-1); padding: var(--space-md);
+}
+.menu {
+  background: var(--paper-raised); border: var(--elev-2-border);
+  box-shadow: var(--elev-2); padding: var(--space-3xs);
+  min-width: 12rem;
+}
+.menu > * {
+  display: block; width: 100%; text-align: left; text-decoration: none;
+  padding: var(--space-3xs) var(--space-2xs); font-size: var(--text-sm);
+  color: var(--ink); background: none; border: 0; cursor: pointer;
+}
+.menu > *:hover { background: var(--paper-sunken); color: var(--ink-strong); }
+
+.modal {
+  background: var(--paper-raised); border: var(--elev-3-border);
+  box-shadow: var(--elev-3); padding: var(--space-lg);
+  max-width: 34rem; width: 100%;
+}
+.scrim { background: rgba(10, 10, 9, 0.45); }
+
+.toast {
+  background: var(--paper-raised); border: var(--border-strong);
+  border-left: var(--edge) solid var(--accent);
+  box-shadow: var(--elev-2); padding: var(--space-2xs) var(--space-sm);
+  font-size: var(--text-sm);
+}
+.toast-error { border-left-color: var(--danger); }
+.toast-warn  { border-left-color: var(--warn); }
+
+/* ===================================================================
+ * Rows. A table row, a calendar cell and a menu option are one height.
+ * =================================================================== */
+
+.rows { display: grid; }
+.row {
+  display: flex; align-items: center; gap: var(--space-2xs);
+  min-height: var(--row-h); padding-inline: var(--space-2xs);
+  border-bottom: var(--border);
+}
+.row:last-child { border-bottom: 0; }
+.row:hover { background: var(--paper-sunken); }
+.row[aria-selected="true"] { background: var(--accent-soft); box-shadow: inset var(--edge) 0 0 var(--accent); }
+
+/* ===================================================================
+ * The three product primitives. One each, and each one is the widget the
+ * product is actually judged on.
+ * =================================================================== */
+
+/* BOOKING — the slot grid. Every slot is the same size whether it is free or
+ * taken, because a grid that reflows as availability loads is a grid the
+ * reader has to re-scan. Taken slots stay in place and lose their border. */
+.slots { display: grid; gap: var(--space-3xs); grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); }
+.slot {
+  min-height: var(--row-h); font: inherit; font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  background: var(--paper-raised); color: var(--ink-strong);
+  border: var(--control-line); border-radius: var(--radius); cursor: pointer;
+}
+.slot:hover { border-color: var(--accent); }
+.slot[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+.slot:disabled { background: var(--paper-sunken); color: var(--ink-faint); border-color: transparent; cursor: not-allowed; }
+
+/* SIGN — the seal. The digest is the artefact, so it is set at full length in
+ * monospace and never truncated with an ellipsis: a hash you cannot read in
+ * full is a hash you cannot check. It wraps instead. */
+.seal {
+  border: var(--border-strong); border-left: var(--edge) solid var(--signal);
+  background: var(--paper-sunken); padding: var(--space-xs) var(--space-sm);
+}
+.seal-label {
+  font-family: var(--font-display); font-size: var(--text-xs);
+  text-transform: uppercase; letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint); font-weight: var(--weight-strong);
+}
+.seal-digest {
+  font-family: var(--font-mono); font-size: var(--text-xs);
+  color: var(--ink-strong); overflow-wrap: anywhere; line-height: var(--leading-snug);
+}
+
+/* TUNNEL — the terminal block.
+ *
+ * A terminal is always dark, in both schemes: inverted against the page in
+ * light, flush with it in dark. A terminal rendered as a light box on a dark
+ * page is the one thing on the screen a developer's eye refuses to accept as
+ * a terminal.
+ *
+ * SO IT IS A SCOPED SCHEME, NOT A BACKGROUND SWAP. An earlier version set only
+ * `background: var(--ink-strong)` and left the semantic colours alone, which
+ * meant `.ok`, `.warn` and the `$` prompt kept values measured against PAPER
+ * and were rendered on INK: 3.67:1, 3.65:1, and 2.88:1 for Sign's prompt —
+ * all under the 4.5:1 floor this system calls non-negotiable, and one of them
+ * under 3:1. The whole ramp is restated here instead, so every token inside a
+ * terminal is the one that was measured against a dark ground. The worst pair
+ * below is 9.21:1.
+ *
+ * The literals are the dark scheme's own values from theme.css. They are
+ * written out because a light-scheme page has no way to reach into a media
+ * query it is not matching. */
+.terminal {
+  --paper: #0b0d0c; --paper-raised: #121513; --paper-sunken: #070908;
+  --line: #232725; --line-strong: #39403c;
+  --ink-faint: #626b66; --ink-muted: #94a09a; --ink: #d6ded9; --ink-strong: #f2f7f4;
+  --accent: #55d37c; --ok: #55d37c; --warn: #e0a955; --danger: #f97066;
+  --signal-sign: #8ab0ff; --signal-booking: #ee9c7c; --signal-tunnel: #4fd0dd;
+  /* `--signal` was resolved on the ancestor carrying `data-product`, so
+   * redefining `--signal-sign` above does not reach it. It is re-derived here,
+   * and the three rules below outrank this one by specificity. */
+  --signal: var(--accent);
+
+  font-family: var(--font-mono); font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  background: var(--paper-sunken); color: var(--ink);
+  border: 1px solid var(--line-strong);
+  padding: var(--space-sm);
+  /* A terminal preserves its lines. Reflowing them is not a smaller terminal,
+   * it is a different transcript — a wrapped `forwarding ... -> ...` reads as
+   * two facts. Long lines scroll sideways inside the box; the page does not. */
+  white-space: pre; overflow-x: auto;
+}
+[data-product="sign"]    .terminal { --signal: var(--signal-sign); }
+[data-product="booking"] .terminal { --signal: var(--signal-booking); }
+[data-product="tunnel"]  .terminal { --signal: var(--signal-tunnel); }
+.terminal .prompt::before { content: "$ "; color: var(--signal); }
+.terminal .ok   { color: var(--ok); }
+.terminal .warn { color: var(--warn); }
+
+/* A live route, a live tunnel, a live envelope: one dot, one word, never a
+ * spinner. `--signal` carries it, because "live" is the product working. */
+.live { display: inline-flex; align-items: center; gap: var(--space-3xs); font-size: var(--text-xs); color: var(--signal); }
+.live::before { content: ""; width: 0.5em; height: 0.5em; background: var(--signal); flex: none; }

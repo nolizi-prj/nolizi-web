@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-tunnel" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="pumasi-tunnel-icon">
+  <title id="pumasi-tunnel-icon">Pumasi Tunnel</title>
+  <!--
+    MANY STREAMS, ONE CONNECTION. Three lanes on the left — three local
+    ports, three protocols, three of whatever you are exposing — arrive at
+    different lengths and collapse along straight diagonals into a single bar leaving to the right. That
+    bar is the one outbound connection the whole product is built on, so
+    it is the only thing here carrying the signal colour, and it is the
+    widest object in the frame.
+
+    The diagonals are the mux. Straight segments meeting at a point, not
+    curves joining a trunk, because a routed packet does not ease in. They are
+    drawn 2.6 units rather than 2: a diagonal covers more distance per pixel of
+    stroke than the horizontal it meets, so at 16px a matched weight renders
+    thinner than the bars and the glyph reads as a faint arrow.
+
+    Signal: cyan.
+  -->
+  <style>
+    .pm-tunnel {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-muted: var(--ink-muted, #5f5f58);
+      --pm-tunnel: var(--signal-tunnel, #0e6f77);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-tunnel {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-muted: var(--ink-muted, #94a09a);
+        --pm-tunnel: var(--signal-tunnel, #4fd0dd);
+      }
+    }
+  </style>
+  <g fill="var(--pm-muted)">
+    <rect x="4.5" y="7" width="4.5" height="3"/>
+    <rect x="5.5" y="22" width="3.5" height="3"/>
+  </g>
+  <rect x="3" y="14.5" width="6" height="3" fill="var(--pm-ink)"/>
+  <path d="M 9 8.5 L 17 16 M 9 16 L 17 16 M 9 23.5 L 17 16" fill="none" stroke="var(--pm-ink)" stroke-width="2.6" stroke-linecap="square"/>
+  <rect x="16" y="14.5" width="13" height="3" fill="var(--pm-tunnel)"/>
+</svg>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-booking" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="pumasi-booking-icon">
+  <title id="pumasi-booking-icon">Pumasi Booking</title>
+  <!--
+    A MONTH, WITH ONE SLOT TAKEN. Six cells, not thirty: the glyph is a
+    calendar at 16 pixels or it is nothing, and thirty cells at that size
+    is grey noise.
+
+    Exactly one cell carries the signal, and it is the only saturated
+    thing in the frame. That is the product in one picture — the whole
+    surface is calm and one square is decided.
+
+    Signal: clay. The two hangers are what make a rectangle read as a
+    calendar rather than as a window; they are the cheapest 5 units here.
+  -->
+  <style>
+    .pm-booking {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-line: var(--line-strong, #b9b9b0);
+      --pm-booking: var(--signal-booking, #a1442a);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-booking {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-line: var(--line-strong, #39403c);
+        --pm-booking: var(--signal-booking, #ee9c7c);
+      }
+    }
+  </style>
+  <rect x="10" y="3" width="2.5" height="6" fill="var(--pm-ink)"/>
+  <rect x="19.5" y="3" width="2.5" height="6" fill="var(--pm-ink)"/>
+  <rect x="3.5" y="6.5" width="25" height="22" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <path d="M 3.5 13.5 L 28.5 13.5" stroke="var(--pm-ink)" stroke-width="2"/>
+  <g fill="var(--pm-line)">
+    <rect x="6.5" y="15.5" width="4.5" height="4.5"/>
+    <rect x="13.75" y="15.5" width="4.5" height="4.5"/>
+    <rect x="21" y="15.5" width="4.5" height="4.5"/>
+    <rect x="6.5" y="22" width="4.5" height="4.5"/>
+    <rect x="21" y="22" width="4.5" height="4.5"/>
+  </g>
+  <rect x="13.75" y="22" width="4.5" height="4.5" fill="var(--pm-booking)"/>
+</svg>
