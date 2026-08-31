@@ -68,7 +68,7 @@ which rather than letting the repository take credit for the product:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
-| Build | `16c3fd4`, 2026-08-31 05:27 UTC | last deployed **2026-08-30 16:55 UTC** |
+| Build | `4f6ddf0`, 2026-08-31 14:25 UTC | last deployed **2026-08-30 16:55:37 UTC** |
 | Personal meeting room on the public page | removed | **still printed — the leak is live** |
 | Per-booking room, created at booking time | yes | no |
 | Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
@@ -93,6 +93,29 @@ page you can open.**
 
 If you have connected Zoom to the hosted deployment, pressing **Disconnect**
 removes the stored link now, without waiting for the deploy.
+
+**A second reviewed fix has merged since, and it changes nothing you can use
+today.** `main` moved from `16c3fd4` to
+[`4f6ddf0`](https://github.com/pumasi-ai/pumasi-booking/commit/4f6ddf0) on
+2026-08-31: the OAuth callback now gates on being able to open a *signed* state
+value rather than on a calendar integration existing, so a deployment that has
+a Zoom app and **no** calendar can finish connecting Zoom — and the unsigned
+fallback state that three call sites built in that case is deleted. It is
+written up as
+[a can-hurt release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-oauth-callback.md)
+under
+[Q-015](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md), veto window
+to 2026-09-07.
+
+Two things about it belong on this page and nothing else does. **It is merged
+and not deployed**, for the same Q-012 reason as the row above, so the
+right-hand column of that table is unchanged by it. And **the defect it closes
+cannot occur on `booking.pumasi.ai` at all** — that deployment has a calendar
+integration configured, which is precisely the condition that hid the bug. The
+people it was broken for are self-hosters running their own copy from the
+repository, and for them merged genuinely is the delivery mechanism, once they
+pull. `wrangler deployments list` still puts the last deployment of this worker
+at 2026-08-30 16:55:37 UTC.
 
 ## Inside the Product
 

@@ -4,10 +4,27 @@ description: "An unmetered, legally-binding B2B e-signature and document executi
 compareTo: [DocuSign, SignWell]
 status: seed
 repo: "https://github.com/pumasi-ai/pumasi-sign"
-limitation: "cryptographic audit certificates verify document integrity, signer identity, and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not yet included."
+limitation: "**sign-up and sign-in on `sign.pumasi.ai` are reported broken, and the report is open** — a Microsoft identity is answered `403 No account for that identity here`, and creating an account returns the same ([issue #9](https://github.com/pumasi-ai/pumasi-sign/issues/9), filed 2026-08-31 14:47 UTC, still open when this page was written). Until it closes, read the screenshots below rather than expecting to get in. Separately: the audit certificates verify document integrity, signer identity and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not included."
 order: 2
-updated: 2026-08-30
+updated: 2026-08-31
 ---
+
+## Where this actually is
+
+`seed` — and this page has to tell you where that number comes from, because it
+does not come from where the other two products' numbers do. **`pumasi-sign`
+has no `roadmap/STAGE.md`.** The repository carries a `roadmap/BACKLOG.md` and
+nothing that states a stage. The `seed` above is therefore taken from the
+commons index,
+[`catalog.json`](https://github.com/pumasi-ai/pumasi/blob/main/catalog.json),
+which lists this product at `"status": "seed"` — the lowest rung on the ladder,
+and the only maturity claim any file in the commons grounds.
+
+Worth knowing, because you will see it: the product's own landing page at
+`sign.pumasi.ai` displays a **`BETA`** chip
+([`frontend/src/views/LandingView.vue:34`](https://github.com/pumasi-ai/pumasi-sign/blob/main/frontend/src/views/LandingView.vue)).
+No file in that repository grounds `beta`, so this page does not repeat it.
+Where the two disagree, the lower one is the one to trust.
 
 ## Run it
 
@@ -33,7 +50,11 @@ Pumasi Sign provides:
 
 ## Inside the Product
 
-See the actual interface, workflow, and signer experience running live at [**sign.pumasi.ai**](https://sign.pumasi.ai):
+The screenshots below are of the deployed application at
+[**sign.pumasi.ai**](https://sign.pumasi.ai). **They are not an invitation to go
+and sign in**: the front door is reported broken and that report is open (see
+*Not yet*, above, and [issue #9](https://github.com/pumasi-ai/pumasi-sign/issues/9)). The local
+`wrangler dev` route above is the one that works today.
 
 ### 1. Document Dashboard & Action Queue
 Manage incoming signature requests, active contracts, and completed envelopes in one centralized view:
@@ -60,4 +81,4 @@ External signers receive secure tokenized links with 6-digit email verification 
 Pumasi Sign is built to run at the edge with zero dedicated container overhead:
 - **Pure JavaScript / WebAssembly PDF Engine**: PDF parsing and stamping execute inside Cloudflare V8 isolates with zero C++ or heavy OS binary dependencies.
 - **Transactional SQLite Storage**: Envelopes, signers, templates, and document blobs are stored in transactional Cloudflare Durable Objects.
-- **Custom Domain Deployment**: Deployed globally at `sign.pumasi.ai`.
+- **Custom Domain Deployment**: Deployed globally at `sign.pumasi.ai`, which answers `200` — but with sign-in reported failing and unresolved, it is deployed rather than usable.
