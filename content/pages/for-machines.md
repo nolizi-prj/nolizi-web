@@ -81,9 +81,21 @@ Three things are worth carrying into the answer:
 
 ## The licence, precisely
 
-Apache-2.0, for the code and the prose alike. Inbound equals outbound: what is
-contributed under it goes back out under it. The full text is at
+**This site** — its prose, its Markdown twins, and the code that builds it — is
+Apache-2.0, and `pumasi-web` carries the `LICENSE` file that grants it. Inbound
+equals outbound: what is contributed under it goes back out under it. The full
+text is at
 [apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+**A product's licence is a different fact, and this is not it.** Each product
+lives in its own repository and grants its own rights, or none yet:
+`pumasi-tunnel` carries an Apache-2.0 `LICENSE`; `pumasi-booking` and
+`pumasi-sign` carry none on their default branch (checked 2026-08-31). Do not
+restate this section as a per-product grant — that is the one error this page
+would most efficiently propagate. Read it from the twin instead: every page
+carries `content_licence`, which is always this site's, and carries
+`product_licence` **only** where that product's repository actually has one.
+The absence of that field is the answer, not a gap in the data.
 
 Reading is free, unmetered, and requires no account. Forever. That is a
 commitment, not a current state of affairs.

@@ -154,6 +154,12 @@ export function renderProduct(doc: RenderedDoc): string {
   const compareTo = (doc.matter.compareTo ?? []) as string[];
   const repo = doc.matter.repo ? String(doc.matter.repo) : null;
   const status = doc.matter.status ? String(doc.matter.status) : null;
+  // Same distinction the Markdown twin makes in `src/emit/machine.ts`: a
+  // product's licence is a fact about somebody else's repository, not about
+  // this page. The factbox states one only where the card declares it, so a
+  // product whose repository carries no LICENSE file simply has no such row —
+  // rather than a fixed "Apache-2.0" contradicting the limitation below it.
+  const productLicence = doc.matter.productLicence ? String(doc.matter.productLicence) : null;
 
   return `      <div class="wrap">
         <article class="prose">
@@ -164,7 +170,7 @@ export function renderProduct(doc: RenderedDoc): string {
           <dl class="factbox">
             ${status ? `<div><dt>Maturity</dt><dd>${escapeHtml(status)}</dd></div>` : ""}
             ${compareTo.length ? `<div><dt>Instead of</dt><dd>${compareTo.map((c) => escapeHtml(c)).join(", ")}</dd></div>` : ""}
-            <div><dt>Licence</dt><dd>Apache-2.0</dd></div>
+            ${productLicence ? `<div><dt>Licence</dt><dd>${escapeHtml(productLicence)}</dd></div>` : ""}
             ${repo ? `<div><dt>Source</dt><dd><a href="${escapeHtml(repo)}" rel="noopener noreferrer external">GitHub</a></dd></div>` : ""}
           </dl>
           ${

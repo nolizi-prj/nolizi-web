@@ -68,7 +68,7 @@ which rather than letting the repository take credit for the product:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
-| Build | `4f6ddf0`, 2026-08-31 14:25 UTC | last deployed **2026-08-30 16:55:37 UTC** |
+| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 |
 | Personal meeting room on the public page | removed | **still printed — the leak is live** |
 | Per-booking room, created at booking time | yes | no |
 | Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
@@ -94,28 +94,57 @@ page you can open.**
 If you have connected Zoom to the hosted deployment, pressing **Disconnect**
 removes the stored link now, without waiting for the deploy.
 
-**A second reviewed fix has merged since, and it changes nothing you can use
-today.** `main` moved from `16c3fd4` to
-[`4f6ddf0`](https://github.com/pumasi-ai/pumasi-booking/commit/4f6ddf0) on
-2026-08-31: the OAuth callback now gates on being able to open a *signed* state
+**Further reviewed fixes have merged since, and none of them changes anything
+you can use today.** This page keeps no running count of them — a tally is a
+cache that goes stale on the next merge, and the one that used to sit here
+already had. The standing fact is the one that does not move: every merged fix
+below waits on the same open Q-012, and
+[`pumasi/releases/`](https://github.com/pumasi-ai/pumasi/tree/main/releases) is
+the current list rather than this paragraph.
+
+**The OAuth callback.** It now gates on being able to open a *signed* state
 value rather than on a calendar integration existing, so a deployment that has
 a Zoom app and **no** calendar can finish connecting Zoom — and the unsigned
-fallback state that three call sites built in that case is deleted. It is
-written up as
-[a can-hurt release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-oauth-callback.md)
-under
-[Q-015](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md), veto window
-to 2026-09-07.
+fallback state that three call sites built in that case is deleted.
+[A can-hurt release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-oauth-callback.md)
+under [Q-015](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md), veto
+window to 2026-09-07.
 
-Two things about it belong on this page and nothing else does. **It is merged
-and not deployed**, for the same Q-012 reason as the row above, so the
-right-hand column of that table is unchanged by it. And **the defect it closes
-cannot occur on `booking.pumasi.ai` at all** — that deployment has a calendar
-integration configured, which is precisely the condition that hid the bug. The
-people it was broken for are self-hosters running their own copy from the
-repository, and for them merged genuinely is the delivery mechanism, once they
-pull. `wrangler deployments list` still puts the last deployment of this worker
-at 2026-08-30 16:55:37 UTC.
+**Signing in no longer requires a Google calendar.** Two sign-in doors asked
+whether a *calendar* was configured and used the answer as though it were
+*"can I sign someone in?"*. A deployment with a Microsoft app and no Google
+Calendar offered **"Continue with Microsoft"** and then answered *"Microsoft
+sign-in is not configured"* — the button and the answer disagreed, and the
+answer was wrong. A company that had pointed the product at its own
+per-organisation single sign-on was told *"SSO is not configured on this
+deployment"* when it was. Neither operator did anything wrong, and the missing
+piece was a third-party calendar they had never asked for. Both doors now ask
+whether they can seal a signed ticket, which is the question they were always
+really asking.
+
+**Nothing was unguarded to get there**, which is the part worth checking rather
+than assuming: each door still refuses on its own missing configuration, the
+tickets are still always signed, and three of the six frozen acceptance cases
+exist precisely to catch the lazy version of this fix — verified by deliberately
+breaking the code and watching them go red.
+[The release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-signin-without-a-calendar.md)
+is a can-hurt note under
+[Q-022 and Q-023](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
+veto window to 2026-09-07.
+
+**What both have in common, and it is the same two things each time.** They are
+**merged and not deployed**, for the same Q-012 reason as the row above, so the
+right-hand column of that table is unchanged by either. And **neither defect can
+occur on `booking.pumasi.ai` at all** — that deployment has Google Calendar
+configured, which is precisely the condition that hid both bugs. The people they
+were broken for are self-hosters, and companies running their own copy from the
+repository; for them merged genuinely is the delivery mechanism, once they pull.
+
+**Neither of them touches the Zoom leak above, which is still live.** Nothing in
+either release goes near it, and nothing has been deployed since:
+`npx wrangler deployments list` still puts the last deployment of this worker at
+2026-08-30 16:55:37 UTC, re-measured 2026-08-31, and `booking.pumasi.ai` answers
+that build today.
 
 ## Inside the Product
 
