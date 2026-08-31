@@ -68,7 +68,7 @@ which rather than letting the repository take credit for the product:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
-| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 |
+| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 at 21:34 UTC |
 | Personal meeting room on the public page | removed | **still printed — the leak is live** |
 | Per-booking room, created at booking time | yes | no |
 | Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
@@ -143,8 +143,8 @@ repository; for them merged genuinely is the delivery mechanism, once they pull.
 **Neither of them touches the Zoom leak above, which is still live.** Nothing in
 either release goes near it, and nothing has been deployed since:
 `npx wrangler deployments list` still puts the last deployment of this worker at
-2026-08-30 16:55:37 UTC, re-measured 2026-08-31, and `booking.pumasi.ai` answers
-that build today.
+**2026-08-30 16:55:37 UTC** — re-measured 2026-08-31 at 21:34 UTC, and it had not
+moved — and `booking.pumasi.ai` answers that build today.
 
 ## Inside the Product
 
@@ -265,6 +265,29 @@ No test count is quoted here. The suite is
 and `npm test` prints the current totals; a number copied into prose is a cache
 with no way to invalidate it. This page carried one that was out by more than
 half before anyone noticed.
+
+**Since 2026-08-31 you are not the only one who can run it.** Every push and
+every pull request is checked in public — the run page opens without an
+account — and what the machine runs is one script in the repository,
+`tools/ci.sh`, so `npm ci && tools/ci.sh` is the same thing on your own
+machine. **It blocks nothing**: no branch protection, no required status check,
+and `GATE: PASS` still means what the charter has always said it means, that an
+agent ran the gate and signed the record. What earns it a paragraph here is the
+other half: **the run states what it did not check, every time it runs.** It
+names `service/test/browser-live.test.ts` — excluded from that one run because
+it drives the live `booking.pumasi.ai` and would go red for a third party's
+reasons — and the script *fails* if that file is not in the suite, so the
+exclusion cannot quietly become a lie the day someone renames a test. It reads
+both `service` tsconfigs at run time and reports that the deployed entry point,
+`src/worker.ts`, is type-checked by neither. And switching it on is what found
+that the root type-check had been skipping the whole `service/` workspace —
+every line that touches HTTP, PostgreSQL, mail and sessions — while exiting
+`0`; that is now closed, with the workspace passing as it already stood.
+[The release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-advisory-ci.md)
+is a can-hurt note under
+[Q-026](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md), veto window
+to 2026-09-07. **It shipped nothing to a user**, so the right-hand column of the
+table above is untouched by it.
 
 ## How it is laid out
 
