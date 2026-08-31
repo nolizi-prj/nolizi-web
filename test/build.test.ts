@@ -180,8 +180,22 @@ test("the Markdown twin carries the canonical URL and the body", async () => {
   const twin = await readFile(join(out, "products/pumasi-booking.md"), "utf8");
   assert.match(twin, /^---\n/);
   assert.match(twin, /url: https:\/\/pumasi\.ai\/products\/pumasi-booking\//);
-  assert.match(twin, /licence: Apache-2\.0/);
+  assert.match(twin, /content_licence: Apache-2\.0/);
   assert.ok(twin.includes("read for busy times"));
+});
+
+test("a product twin claims a product licence only when its card states one", async () => {
+  // pumasi-web's own content is Apache-2.0 and every twin says so. That is not
+  // a statement about the product the card describes. pumasi-booking and
+  // pumasi-sign carry no LICENSE file on their default branch, so their twins
+  // must not hand a crawler a licence nobody granted.
+  for (const slug of ["pumasi-booking", "pumasi-sign"]) {
+    const twin = await readFile(join(out, `products/${slug}.md`), "utf8");
+    assert.match(twin, /content_licence: Apache-2\.0/, slug);
+    assert.ok(!/product_licence:/.test(twin), `${slug} twin claims a product licence`);
+  }
+  const tunnel = await readFile(join(out, "products/pumasi-tunnel.md"), "utf8");
+  assert.match(tunnel, /product_licence: "Apache-2\.0"/);
 });
 
 test("a product states its limitation before its features", () => {

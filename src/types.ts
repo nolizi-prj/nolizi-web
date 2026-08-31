@@ -52,10 +52,18 @@ export interface FrontMatter {
   repo?: string;
   /** Product pages: what a person would otherwise pay for. */
   compareTo?: string[];
-  /** Product pages: seed | beta | stable. */
+  /** Product pages: the rung from the product's own roadmap/STAGE.md — seed | alpha | beta | launched. */
   status?: string;
   /** Product pages: the honest one-liner about what it cannot do yet. */
   limitation?: string;
+  /**
+   * Product pages: the SPDX licence of the PRODUCT's repository — set only
+   * when that repository actually carries the file. Absent means absent: a
+   * public repository with no LICENSE grants no rights, and this site does not
+   * fill that silence with a default. Distinct from the site's own content
+   * licence, which every page carries regardless.
+   */
+  productLicence?: string;
   [key: string]: unknown;
 }
 
