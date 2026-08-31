@@ -198,6 +198,44 @@ test("a product twin claims a product licence only when its card states one", as
   assert.match(tunnel, /product_licence: "Apache-2\.0"/);
 });
 
+test("a page states a product's licence only where that product's card declares one", async () => {
+  // The human-readable half of the rule the test above enforces for crawlers,
+  // and the half that was missing: `renderProduct` printed a fixed
+  // `Licence: Apache-2.0` factbox row on every product page, directly above the
+  // limitation callout in which pumasi-booking and pumasi-sign each said they
+  // have no licence file. The page contradicted itself on one screen, and the
+  // structured row is the half a reader scans.
+  //
+  // Keyed off the card's own `productLicence` rather than a list of products,
+  // so the next product is covered the day its card lands.
+  for (const slug of ["pumasi-booking", "pumasi-sign"]) {
+    const page = byPath.get(`products/${slug}/index.html`) as string;
+    assert.ok(!/<dt>Licence<\/dt>/.test(page),
+      `${slug} states a licence in its factbox, and its card declares none`);
+  }
+  const tunnel = byPath.get("products/pumasi-tunnel/index.html") as string;
+  assert.match(tunnel, /<dt>Licence<\/dt><dd>Apache-2\.0<\/dd>/);
+
+  // And on the products index, whose whole job is to speak about the set: a
+  // licence name is a grant somebody may rely on, so it may only appear beside
+  // the repository it was read from. "Each product below is Apache-2.0" — the
+  // sentence that shipped here — names no repository and is how three products
+  // came to be granted a licence two of them do not carry.
+  //
+  // Scoped to this page on purpose. Elsewhere the same words are policy about
+  // the commons' own content, which is true and must not be flagged; here every
+  // licence claim is per-product by construction.
+  const licenceName = /\b(?:Apache-2\.0|MIT|BSD-[23]-Clause|GPL-[23]\.0|MPL-2\.0)\b/;
+  const namesARepo = /pumasi-(?:web|booking|sign|tunnel)|<repo>/;
+  const intro = await readFile(join(out, "products.md"), "utf8");
+  for (const line of intro.split("\n")) {
+    if (line.startsWith("content_licence:")) continue; // the site's own, always true
+    if (!licenceName.test(line)) continue;
+    assert.match(line, namesARepo,
+      `the products index states a licence without naming the repository it came from:\n${line}`);
+  }
+});
+
 test("a priced claim about someone else's product carries the date we read it", () => {
   // The rule that removed the Adobe Sign and PandaDoc rows from the DocuSign
   // post: a dollar figure attributed to an outside vendor is publishable only
