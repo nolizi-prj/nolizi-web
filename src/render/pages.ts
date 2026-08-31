@@ -86,11 +86,41 @@ function postSection(posts: RenderedDoc[]): string {
         </section>`;
 }
 
+/**
+ * A product's repository name to its signal key. A product's slug is
+ * `products/<name>`, so the name is the last segment — keying this map on the
+ * whole slug matches nothing, silently, and every card falls back.
+ *
+ * A product not in this map still renders: it falls back to the seeded plot
+ * art, so adding a product is not blocked on drawing it a mark first.
+ */
+const SIGNAL_KEY: Record<string, string> = {
+  "pumasi-sign": "sign",
+  "pumasi-booking": "booking",
+  "pumasi-tunnel": "tunnel",
+};
+
+/**
+ * The card head used to be a seeded mosaic 150px tall. It was the loudest
+ * object on the card, it carried no information, and the three of them were
+ * near-identical — so the two things the page exists to convey, the product's
+ * name and how much of it is actually built, sat below the noise and quieter
+ * than it. It is the product's own mark now, on its own signal ground, at the
+ * size a mark is meant to be read at.
+ *
+ * The mark is the published file rather than a copy generated here. A second
+ * drawing of the same glyph is a second drawing to keep in step.
+ */
 export function productCard(doc: RenderedDoc): string {
   const compareTo = (doc.matter.compareTo ?? []) as string[];
   const status = doc.matter.status ? String(doc.matter.status) : null;
-  return `<article class="card">
-              <div class="card-art">${plotArt(doc.slug, 560, 150, 0.45)}</div>
+  const name = doc.slug.split("/").pop() ?? doc.slug;
+  const signal = SIGNAL_KEY[name];
+  const head = signal
+    ? `<div class="card-mark"><img src="/brand/${escapeHtml(name)}-icon.svg" alt="" width="32" height="32" loading="lazy"></div>`
+    : `<div class="card-art">${plotArt(doc.slug, 560, 150, 0.45)}</div>`;
+  return `<article class="card${signal ? " card-signal" : ""}"${signal ? ` data-product="${escapeHtml(signal)}"` : ""}>
+              ${head}
               <h3><a href="${escapeHtml(doc.urlPath)}">${escapeHtml(doc.matter.title)}</a></h3>
               ${status ? `<p class="badge badge-${escapeHtml(status)}">${escapeHtml(status)}</p>` : ""}
               <p>${renderInline(doc.matter.description)}</p>

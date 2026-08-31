@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-commons" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="pumasi-icon">
+  <title id="pumasi-icon">Pumasi</title>
+  <!--
+    THE COMMONS MARK. A bracketed stack: three rows of work inside a
+    boundary. Pumasi is the Korean word for neighbours taking turns at
+    each other's labour, so the mark is turns — three bars of unequal
+    length, because the turns are not equal — held inside one boundary
+    that belongs to nobody.
+
+    It has to survive being 16 pixels wide in a browser tab, so it is
+    two brackets and three bars and nothing else.
+  -->
+  <style>
+    .pm-commons {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-accent: var(--accent, #197a3d);
+      --pm-warn: var(--warn, #9a5b00);
+      --pm-ok: var(--ok, #197a3d);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-commons {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-accent: var(--accent, #55d37c);
+        --pm-warn: var(--warn, #e0a955);
+        --pm-ok: var(--ok, #55d37c);
+      }
+    }
+  </style>
+  <path d="M 8 3 L 3 3 L 3 29 L 8 29" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <path d="M 24 3 L 29 3 L 29 29 L 24 29" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <rect x="9" y="8" width="14" height="3" fill="var(--pm-accent)"/>
+  <rect x="9" y="14.5" width="10" height="3" fill="var(--pm-warn)"/>
+  <rect x="9" y="21" width="14" height="3" fill="var(--pm-ok)"/>
+</svg>

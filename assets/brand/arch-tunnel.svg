@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-arch-tunnel" viewBox="0 0 960 312" width="960" height="312" role="img" aria-labelledby="arch-tunnel">
+  <title id="arch-tunnel">How Pumasi Tunnel reaches a machine behind NAT without opening a port.</title>
+  <style>
+    .pm-arch-tunnel {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-muted: var(--ink-muted, #5f5f58);
+      --pm-faint: var(--ink-faint, #8d8d84);
+      --pm-line: var(--line-strong, #b9b9b0);
+      --pm-hair: var(--line, #dfdfd9);
+      --pm-raised: var(--paper-raised, #ffffff);
+      --pm-sunken: var(--paper-sunken, #f2f2ef);
+      --pm-ground: var(--art-ground, #f2f2ef);
+      --pm-accent: var(--accent, #197a3d);
+      --pm-warn: var(--warn, #9a5b00);
+      --pm-sign: var(--signal-sign, #2350c8);
+      --pm-booking: var(--signal-booking, #a1442a);
+      --pm-tunnel: var(--signal-tunnel, #0e6f77);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-arch-tunnel {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-muted: var(--ink-muted, #94a09a);
+        --pm-faint: var(--ink-faint, #626b66);
+        --pm-line: var(--line-strong, #39403c);
+        --pm-hair: var(--line, #232725);
+        --pm-raised: var(--paper-raised, #121513);
+        --pm-sunken: var(--paper-sunken, #070908);
+        --pm-ground: var(--art-ground, #070908);
+        --pm-accent: var(--accent, #55d37c);
+        --pm-warn: var(--warn, #e0a955);
+        --pm-sign: var(--signal-sign, #8ab0ff);
+        --pm-booking: var(--signal-booking, #ee9c7c);
+        --pm-tunnel: var(--signal-tunnel, #4fd0dd);
+      }
+    }
+  </style>
+  <rect width="960" height="312" fill="var(--pm-ground)"/><rect x="0.75" y="0.75" width="958.5" height="310.5" fill="none" stroke="var(--pm-line)" stroke-width="1.5"/><text x="40" y="42" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="12.5" font-weight="700" fill="var(--pm-tunnel)" text-anchor="start" letter-spacing="1.4">// PUMASI TUNNEL</text><text x="40" y="60" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-faint)" text-anchor="start">How Pumasi Tunnel reaches a machine behind NAT without opening a port.</text><rect x="40" y="76" width="184" height="104" fill="var(--pm-raised)" stroke="var(--pm-line)" stroke-width="1.5"/><text x="54" y="108" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="14.5" font-weight="700" fill="var(--pm-ink)" text-anchor="start">Your machine</text><text x="54" y="132" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">localhost:3000</text><text x="54" y="149" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">localhost:3389, 5432</text><path d="M 228 128.0 L 262 128.0" stroke="var(--pm-line)" stroke-width="1.5"/><polygon points="271,128.0 261,122.5 261,133.5" fill="var(--pm-line)"/><text x="248.0" y="115.0" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="10.5" font-weight="400" fill="var(--pm-faint)" text-anchor="middle">mux</text><rect x="272" y="76" width="184" height="104" fill="var(--pm-raised)" stroke="var(--pm-line)" stroke-width="1.5"/><rect x="272" y="76" width="184" height="3" fill="var(--pm-tunnel)"/><text x="286" y="108" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="14.5" font-weight="700" fill="var(--pm-ink)" text-anchor="start">Agent</text><text x="286" y="132" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">one outbound conn</text><text x="286" y="149" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">no inbound port open</text><path d="M 460 128.0 L 494 128.0" stroke="var(--pm-line)" stroke-width="1.5"/><polygon points="503,128.0 493,122.5 493,133.5" fill="var(--pm-line)"/><text x="480.0" y="115.0" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="10.5" font-weight="400" fill="var(--pm-faint)" text-anchor="middle">SSH</text><rect x="504" y="76" width="184" height="104" fill="var(--pm-raised)" stroke="var(--pm-line)" stroke-width="1.5"/><rect x="504" y="76" width="184" height="3" fill="var(--pm-tunnel)"/><text x="518" y="108" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="14.5" font-weight="700" fill="var(--pm-ink)" text-anchor="start">Relay</text><text x="518" y="132" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">you run it today</text><text x="518" y="149" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">single Go binary</text><path d="M 692 128.0 L 726 128.0" stroke="var(--pm-line)" stroke-width="1.5"/><polygon points="735,128.0 725,122.5 725,133.5" fill="var(--pm-line)"/><text x="712.0" y="115.0" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="10.5" font-weight="400" fill="var(--pm-faint)" text-anchor="middle">route</text><rect x="736" y="76" width="184" height="104" fill="var(--pm-raised)" stroke="var(--pm-line)" stroke-width="1.5"/><text x="750" y="108" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="14.5" font-weight="700" fill="var(--pm-ink)" text-anchor="start">Public URL</text><text x="750" y="132" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">HTTP by subdomain</text><text x="750" y="149" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="11.5" font-weight="400" fill="var(--pm-muted)" text-anchor="start">raw TCP by port</text><rect x="40" y="214" width="880" height="52" fill="var(--pm-sunken)" stroke="var(--pm-hair)" stroke-width="1.5"/><rect x="40" y="214" width="3" height="52" fill="var(--pm-warn)"/><text x="58" y="236" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="10.5" font-weight="700" fill="var(--pm-faint)" text-anchor="start" letter-spacing="1.6">WHAT IS NOT BUILT YET</text><text x="58" y="254" font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="var(--pm-ink)" text-anchor="start">There is no hosted relay. tunnel.pumasi.ai does not resolve; the relay here is one you start.</text>
+</svg>

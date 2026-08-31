@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-logo" viewBox="0 0 144 40" width="144" height="40" role="img" aria-labelledby="pumasi-logo">
+  <title id="pumasi-logo">Pumasi — a commons of working software</title>
+  <!--
+    THE LOCKUP: mark, one clear space of 12 units, wordmark.
+
+    The wordmark is set in the reader's own monospace rather than drawn as
+    outlines, because that IS the brand: the site, the products and this file
+    are all set in the type the work is written in, and a logo that is the one
+    thing on the page in a different face is the seam.
+
+    textLength with lengthAdjust="spacing" pins the width to 94 units on every
+    machine, so the lockup's geometry is fixed even though the glyphs are not.
+    A system without JetBrains Mono gets its own monospace at the same overall
+    width, with the letterforms undistorted — "spacing", never
+    "spacingAndGlyphs", which would stretch them.
+
+    Clear space: 8 units on every side, a quarter of the mark. Minimum width:
+    72 units, below which use pumasi-icon.svg on its own.
+  -->
+  <style>
+    .pm-logo {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-accent: var(--accent, #197a3d);
+      --pm-warn: var(--warn, #9a5b00);
+      --pm-ok: var(--ok, #197a3d);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-logo {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-accent: var(--accent, #55d37c);
+        --pm-warn: var(--warn, #e0a955);
+        --pm-ok: var(--ok, #55d37c);
+      }
+    }
+  </style>
+  <path d="M 8 8 L 4 8 L 4 32 L 8 32" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <path d="M 24 8 L 28 8 L 28 32 L 24 32" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <rect x="9" y="12.5" width="13" height="2.8" fill="var(--pm-accent)"/>
+  <rect x="9" y="18.6" width="9" height="2.8" fill="var(--pm-warn)"/>
+  <rect x="9" y="24.7" width="13" height="2.8" fill="var(--pm-ok)"/>
+  <text x="40" y="27.5" textLength="94" lengthAdjust="spacing"
+        font-family="ui-monospace, SFMono-Regular, 'SF Mono', 'JetBrains Mono', 'Geist Mono', Menlo, Consolas, monospace"
+        font-size="21" font-weight="700" letter-spacing="2.3"
+        fill="var(--pm-ink)">PUMASI</text>
+</svg>

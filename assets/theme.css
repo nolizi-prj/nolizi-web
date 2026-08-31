@@ -34,7 +34,7 @@
   --ink:            #1c1c1a;
   --ink-strong:     #0a0a09;
 
-  --accent:          #197a3d;   /* 5.2:1 on paper */
+  --accent:          #197a3d;   /* 5.26:1 on paper, measured */
   --accent-strong:   #0f5a2b;
   --accent-soft:     #e9f4ec;
   --accent-line:     #bcdcc6;
@@ -46,6 +46,35 @@
   --ok:        #197a3d;
   --ok-soft:   #e9f4ec;
   --ok-line:   #bcdcc6;
+  /* The commons had no failure colour at all, which is why every product
+   * invented its own. 6.40:1 on paper, 7.00:1 on dark. */
+  --danger:      #b42318;
+  --danger-soft: #fdf2f1;
+  --danger-line: #f0c4bf;
+
+  /* Product signals. One hue each, held inside a narrow contrast band —
+   * 5.75-6.70 on paper, 8.99-10.58 on dark — so the three products read as
+   * siblings rather than as three brands. The band, not the hue, is what
+   * makes them a family; `test/contrast.test.ts` guards it. A
+   * signal is NOT an interaction colour: `--accent` stays green on every
+   * surface in the commons, and a signal only ever marks *which product this
+   * is* — the icon, the product page's edge rule, the diagram's live path.
+   * That split is the whole fix for the fragmentation: the thing you click is
+   * the same colour everywhere, and the thing that identifies is not. */
+  --signal-sign:         #2350c8;   /* blue — document, authority */
+  --signal-sign-soft:    #eef2fd;
+  --signal-sign-line:    #c3d0f4;
+  --signal-booking:      #a1442a;   /* clay — warm, human, unhurried */
+  --signal-booking-soft: #fdf1ed;
+  --signal-booking-line: #f0c9ba;
+  --signal-tunnel:       #0e6f77;   /* cyan — wire, stream, routing */
+  --signal-tunnel-soft:  #e8f4f5;
+  --signal-tunnel-line:  #b3d8db;
+  /* The surface sets this to its own product's signal; everything downstream
+   * reads `--signal` and never names a product. */
+  --signal:      var(--accent);
+  --signal-soft: var(--accent-soft);
+  --signal-line: var(--accent-line);
 
   --art-ground: #f2f2ef;
   --art-1: #197a3d;
@@ -54,9 +83,24 @@
   --art-4: #b9b9b0;
   --art-ink: #1c1c1a;
 
-  /* One typeface, everywhere. */
+  /* One typeface, everywhere — on this site. `--font-mono` leads with the
+   * reader's own monospace and names JetBrains Mono and Geist Mono ahead of
+   * the older system faces, so a developer who already has one installed gets
+   * it without a font request.
+   *
+   * `--font-ui` is the proportional stack, and nothing on pumasi.ai uses it.
+   * It is defined here because the token VOCABULARY has to be one vocabulary:
+   * a product application — a signing canvas, a calendar grid, a settings
+   * form — is dense, and setting a 40-row table in monospace costs real
+   * horizontal room. Those surfaces load `/brand/product-theme.css`, which
+   * points `--font-body` at this stack. It is a system stack on purpose: a
+   * web font is a third-party request and a blocking paint, and self-hosting
+   * one face later is one @font-face and no token change. */
   --font-mono:    ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono",
-                  Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+                  "Geist Mono", Menlo, Consolas, "Liberation Mono",
+                  "Courier New", monospace;
+  --font-ui:      Inter, "Geist Sans", ui-sans-serif, system-ui, -apple-system,
+                  "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-mono);
   --font-body:    var(--font-mono);
 
@@ -81,6 +125,9 @@
 
   --tracking-display: -0.01em;
   --tracking-caps:    0.1em;
+  --weight-body:      400;
+  --weight-medium:    600;
+  --weight-strong:    700;
   --weight-display:   600;
 
   --measure: 56ch;
@@ -107,11 +154,52 @@
 
   --border: 1px solid var(--line);
   --border-strong: 1px solid var(--line-strong);
+  --border-accent: 1px solid var(--accent);
+  /* A CARD's edge and a CONTROL's edge are not the same object, and WCAG does
+   * not treat them the same. `--line-strong` is 1.92:1 on paper: fine for the
+   * structural rule around a card, which nobody has to find, and not fine as
+   * the entire visible boundary of a text input or a bookable slot, which is
+   * how a person knows there is something there to operate. 1.4.11 wants 3:1
+   * for that; `--line-control` is 3.35:1 on paper and 3.71:1 on dark.
+   * Use it for anything a person can type in, press or choose. */
+  --line-control:   #8b8b82;
+  --control-line: 1px solid var(--line-control);
   --rule: 1px dashed var(--line-strong);
+  /* The width of a left-edge marker — callouts, the machine note, a quoted
+   * block. It was 3px written out in four places, which is how the four drift
+   * apart. */
+  --edge: 3px;
 
-  --shadow-sm: none;
-  --shadow:    none;
-  --shadow-lg: none;
+  /* Elevation, in four steps, is a scale the whole commons shares. Console
+   * spends none of it on blur: a thing that is "higher" here is higher because
+   * its border is heavier and its ground is lighter, which is what
+   * `--elev-*-border` and `--elev-*-ground` are for. `/brand/product-theme.css`
+   * redefines the same four steps as real shadows for application surfaces,
+   * where a floating menu genuinely has to look like it is floating.
+   *
+   * `--shadow-sm/--shadow/--shadow-lg` remain as the names base.css and any
+   * existing consumer already know; they are aliases now, not a second scale. */
+  --elev-0: none;
+  --elev-1: none;
+  --elev-2: none;
+  --elev-3: none;
+  --elev-1-border: var(--border);
+  --elev-2-border: var(--border-strong);
+  --elev-3-border: var(--border-strong);
+  --elev-1-ground: var(--paper-raised);
+  --elev-2-ground: var(--paper-raised);
+  --elev-3-ground: var(--paper-raised);
+
+  --shadow-sm: var(--elev-1);
+  --shadow:    var(--elev-2);
+  --shadow-lg: var(--elev-3);
+
+  --btn-pad-y:    0.5rem;
+  --btn-pad-x:    0.9rem;
+  --btn-pad-y-sm: 0.25rem;
+  --btn-pad-x-sm: 0.6rem;
+  --btn-pad-y-lg: 0.7rem;
+  --btn-pad-x-lg: 1.25rem;
 
   --ease: steps(1, end);
   --duration: 1ms;
@@ -127,6 +215,7 @@
     --paper-sunken:   #070908;
     --line:           #232725;
     --line-strong:    #39403c;
+    --line-control:   #656e6a;
     --ink-faint:      #626b66;
     --ink-muted:      #94a09a;
     --ink:            #d6ded9;
@@ -144,6 +233,19 @@
     --ok:        #55d37c;
     --ok-soft:   #0d1f14;
     --ok-line:   #1d3a28;
+    --danger:      #f97066;
+    --danger-soft: #24100e;
+    --danger-line: #46201c;
+
+    --signal-sign:         #8ab0ff;
+    --signal-sign-soft:    #101728;
+    --signal-sign-line:    #22314f;
+    --signal-booking:      #ee9c7c;
+    --signal-booking-soft: #241410;
+    --signal-booking-line: #472a21;
+    --signal-tunnel:       #4fd0dd;
+    --signal-tunnel-soft:  #08201f;
+    --signal-tunnel-line:  #113b3d;
 
     --art-ground: #070908;
     --art-1: #55d37c;
@@ -190,22 +292,54 @@ body { font-variant-ligatures: none; }
 .hero-lede { font-size: var(--text-md); color: var(--ink-muted); max-width: var(--measure); }
 .hero-art svg { border: var(--border-strong); }
 
+/* Four ranks, and a page is allowed exactly one primary. The prompt caret is
+ * the family resemblance: every rank keeps it, so a quiet button still reads as
+ * the same kind of object as a loud one. */
 .button {
-  padding: 0.5rem 0.9rem;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
   background: var(--accent); color: var(--accent-contrast);
-  font-size: var(--text-sm); font-weight: 600; border-color: var(--accent);
+  font-size: var(--text-sm); font-weight: var(--weight-medium); border-color: var(--accent);
 }
 .button::before { content: "> "; opacity: 0.65; }
 .button:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--accent-contrast); }
-.button-quiet { background: transparent; color: var(--ink-strong); border-color: var(--line-strong); }
+
+/* 2 — secondary. The alternative to the primary, not a lesser copy of it. */
+.button-quiet { background: transparent; color: var(--ink-strong); border-color: var(--line-control); }
 .button-quiet:hover { background: var(--paper-sunken); color: var(--ink-strong); border-color: var(--ink-muted); }
-.more { color: var(--accent); font-size: var(--text-sm); font-weight: 600; }
+
+/* 3 — tertiary. For an action that must be reachable and must not compete:
+ * "cancel", "back", the third thing in a row of three. */
+.button-ghost { background: transparent; color: var(--ink-muted); border-color: transparent; }
+.button-ghost::before { color: var(--accent); opacity: 1; }
+.button-ghost:hover { background: var(--paper-sunken); color: var(--ink-strong); border-color: var(--line); }
+
+/* 4 — destructive. Outlined, never filled: a delete button that is the
+ * loudest thing on the screen gets pressed by accident. It fills on hover,
+ * once the pointer is already on it. */
+.button-danger { background: transparent; color: var(--danger); border-color: var(--danger-line); }
+.button-danger::before { content: "! "; opacity: 1; }
+.button-danger:hover { background: var(--danger); color: var(--paper); border-color: var(--danger); }
+
+.button-sm { padding: var(--btn-pad-y-sm) var(--btn-pad-x-sm); font-size: var(--text-xs); }
+.button-lg { padding: var(--btn-pad-y-lg) var(--btn-pad-x-lg); font-size: var(--text-base); }
+.button[aria-disabled="true"], .button:disabled {
+  background: var(--paper-sunken); color: var(--ink-faint);
+  border-color: var(--line); cursor: not-allowed;
+}
+
+.more { color: var(--accent); font-size: var(--text-sm); font-weight: var(--weight-medium); }
 
 /* Headings carry their level as syntax. */
 .section > h2, .prose h2 { font-size: var(--text-xl); font-weight: 700; padding-bottom: var(--space-2xs); border-bottom: var(--rule); }
 .prose h2::before, .section > h2::before { content: "## "; color: var(--accent); font-weight: 400; }
 .prose h3 { font-size: var(--text-lg); font-weight: 700; }
 .prose h3::before { content: "### "; color: var(--accent); font-weight: 400; }
+/* A component dropped into prose keeps its own heading. The `##` prefixes are
+ * document structure — they say "this is the third level of this page" — and a
+ * card's title is not a level of the page it sits on. Without this, a card
+ * embedded in a prose page renders "### Card". */
+.prose .card h2::before, .prose .card h3::before, .prose .card h4::before,
+.prose .callout h3::before, .prose .callout h4::before { content: none; }
 .prose h4 { font-size: var(--text-base); font-weight: 700; }
 .prose h4::before { content: "#### "; color: var(--accent); font-weight: 400; }
 
@@ -233,38 +367,82 @@ body { font-variant-ligatures: none; }
 .crumbs a:hover { color: var(--accent); }
 .crumbs li + li::before { content: "/"; margin-right: var(--space-3xs); color: var(--line-strong); }
 
-.factbox { border: var(--border-strong); padding: var(--space-sm) var(--space-md); background: var(--paper-raised); }
+.factbox { border: var(--elev-1-border); padding: var(--space-sm) var(--space-md); background: var(--elev-1-ground); box-shadow: var(--elev-1); }
 .factbox dt { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--ink-faint); }
 .factbox dd { color: var(--ink-strong); font-weight: 600; font-size: var(--text-sm); margin-top: 2px; }
 
-.callout { padding: var(--space-sm) var(--space-md); border: var(--border-strong); border-left-width: 3px; background: var(--paper-raised); }
+.callout { padding: var(--space-sm) var(--space-md); border: var(--elev-2-border); border-left-width: var(--edge); background: var(--elev-2-ground); box-shadow: var(--elev-2); }
 .callout-warn { background: var(--warn-soft); border-color: var(--warn-line); border-left-color: var(--warn); }
 .callout-good { background: var(--ok-soft); border-color: var(--ok-line); border-left-color: var(--ok); }
 .callout-note { background: var(--accent-soft); border-color: var(--accent-line); border-left-color: var(--accent); }
+.callout-danger { background: var(--danger-soft); border-color: var(--danger-line); border-left-color: var(--danger); }
 .callout-warn strong::before { content: "! "; color: var(--warn); }
+.callout-danger strong::before { content: "!! "; color: var(--danger); }
 
+/* THE STAGE BADGE.
+ *
+ * One component, one grammar, five rungs, and it is the same object in every
+ * repository in the commons — `[ALPHA]` on pumasi.ai and `[ALPHA]` in the Sign
+ * application are the same claim, so they are the same shape. The brackets are
+ * generated, never typed: a badge whose brackets are in the content can be
+ * written without them.
+ *
+ * The ladder gets louder as the claim gets stronger, which is the point —
+ * the visual weight is the honesty:
+ *
+ *   planned   grey outline    nothing exists yet
+ *   seed      amber outline   it exists and it will change under you
+ *   alpha     amber outline   you run it yourself
+ *   beta      green outline   it is hosted and it holds
+ *   launched  green FILLED    the mandatory-review bar applies
+ *
+ * `.badge` alone is the seed/unknown rung, so a status the renderer has never
+ * heard of degrades to "provisional" rather than to "stable". */
 .badge {
   font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps);
-  font-weight: 700; padding: 0.15em 0.5em; border: 1px solid var(--warn-line);
+  font-weight: var(--weight-strong); padding: 0.15em 0.5em; border: 1px solid var(--warn-line);
   background: var(--warn-soft); color: var(--warn);
 }
 .badge::before { content: "["; } .badge::after { content: "]"; }
-/* The stage ladder. seed and alpha inherit .badge's provisional (warn) styling
-   rather than restating it; beta has earned a step away from that and is not
-   yet stable. */
+.badge-seed, .badge-alpha { border-color: var(--warn-line); background: var(--warn-soft); color: var(--warn); }
 .badge-beta { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
+.badge-launched { border-color: var(--ok); background: var(--ok); color: var(--accent-contrast); }
+/* `stable` is the name this rung had before the ladder was written down. Kept
+ * so an older page does not silently lose its badge; do not use it. */
 .badge-stable { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
 .badge-planned { border-color: var(--line-strong); background: var(--paper-sunken); color: var(--ink-muted); }
 .tag { font-size: var(--text-xs); color: var(--ink-muted); border: var(--border); background: var(--paper-sunken); padding: 0.12em 0.5em; }
 .tag::before { content: "#"; color: var(--accent); }
 
-.card { background: var(--paper-raised); border: var(--border-strong); padding: var(--space-md); }
+/* The card is the commons' one container. Square, one visible border, ground
+ * one step off the page, and its whole hover state is the border going accent —
+ * no lift, no scale, no shade. On an application surface the same three
+ * elevation tokens resolve to real shadows and the card lifts; the markup does
+ * not change, which is what makes this one component and not two.
+ *
+ * `.card-signal` is the product variant: a single edge rule in the product's
+ * signal colour. A card is identified along one edge and nowhere else — that
+ * is the entire licence a signal colour has on a shared surface. */
+.card { background: var(--elev-2-ground); border: var(--elev-2-border); box-shadow: var(--elev-2); padding: var(--space-md); }
 .card:hover { border-color: var(--accent); }
+.card-signal { border-top: var(--edge) solid var(--signal); }
+.card-signal:hover { border-color: var(--signal); border-top-color: var(--signal); }
+[data-product="sign"]    { --signal: var(--signal-sign);    --signal-soft: var(--signal-sign-soft);    --signal-line: var(--signal-sign-line); }
+[data-product="booking"] { --signal: var(--signal-booking); --signal-soft: var(--signal-booking-soft); --signal-line: var(--signal-booking-line); }
+[data-product="tunnel"]  { --signal: var(--signal-tunnel);  --signal-soft: var(--signal-tunnel-soft);  --signal-line: var(--signal-tunnel-line); }
 .card h3 { font-size: var(--text-lg); font-weight: 700; }
 .card h3 a { text-decoration: none; color: var(--ink-strong); }
 .card h3 a:hover { color: var(--accent); }
 .card p { color: var(--ink-muted); font-size: var(--text-sm); }
 .card-art { margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-md)) var(--space-2xs); border-bottom: var(--border); }
+/* The mark strip. Quiet on purpose: it identifies, and the name below it is
+ * what the reader is here for. Ground is the product's own signal at its
+ * softest, which is the only place a signal is allowed to fill anything. */
+.card-mark {
+  margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-md)) var(--space-2xs);
+  padding: var(--space-2xs) var(--space-md);
+  background: var(--signal-soft); border-bottom: 1px solid var(--signal-line);
+}
 .card-meta { font-size: var(--text-xs); color: var(--ink-faint); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
 .card-limitation { padding-top: var(--space-2xs); border-top: var(--rule); font-size: var(--text-sm); color: var(--ink-muted); }
 .card-limitation strong { color: var(--warn); }
@@ -295,7 +473,7 @@ body { font-variant-ligatures: none; }
 .footer-links a::before { content: "["; color: var(--line-strong); }
 .footer-links a::after { content: "]"; color: var(--line-strong); }
 .footer-links a:hover { color: var(--accent); }
-.footer-machine { padding: var(--space-xs) var(--space-sm); background: var(--paper-raised); border: var(--border-strong); border-left: 3px solid var(--accent); }
+.footer-machine { padding: var(--space-xs) var(--space-sm); background: var(--paper-raised); border: var(--border-strong); border-left: var(--edge) solid var(--accent); }
 .footer-nothing { color: var(--ink-faint); }
 
 .swatch { border: var(--border-strong); background: var(--paper-raised); }

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pm-sign" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="pumasi-sign-icon">
+  <title id="pumasi-sign-icon">Pumasi Sign</title>
+  <!--
+    A SEALED PAGE. The document is a rectangle with the corner turned; the
+    seal is a diamond, not a rosette, because nothing in this system has a
+    curve in it and a wax seal drawn with curves would be the only round
+    thing in the whole commons.
+
+    The check sits INSIDE the seal rather than beside it: a tick next to a
+    document says "done"; a tick inside a seal says "this artefact is the
+    one that was sealed", which is the claim the product actually makes.
+
+    Signal: blue. The seal is 10 units across, a third of the frame, so it
+    survives the tab strip.
+  -->
+  <style>
+    .pm-sign {
+      --pm-ink: var(--ink-strong, #0a0a09);
+      --pm-line: var(--line-strong, #b9b9b0);
+      --pm-paper: var(--paper, #fcfcfb);
+      --pm-sign: var(--signal-sign, #2350c8);
+    }
+    @media (prefers-color-scheme: dark) {
+      .pm-sign {
+        --pm-ink: var(--ink-strong, #f2f7f4);
+        --pm-line: var(--line-strong, #39403c);
+        --pm-paper: var(--paper, #0b0d0c);
+        --pm-sign: var(--signal-sign, #8ab0ff);
+      }
+    }
+  </style>
+  <path d="M 6.5 3 L 19.5 3 L 25.5 9 L 25.5 29 L 6.5 29 Z" fill="none" stroke="var(--pm-ink)" stroke-width="2" stroke-linejoin="miter"/>
+  <path d="M 19.5 3 L 19.5 9 L 25.5 9" fill="none" stroke="var(--pm-ink)" stroke-width="2"/>
+  <rect x="10" y="12" width="12" height="1.8" fill="var(--pm-line)"/>
+  <rect x="10" y="15.6" width="7.5" height="1.8" fill="var(--pm-line)"/>
+  <path d="M 16 18 L 21 23 L 16 28 L 11 23 Z" fill="var(--pm-sign)"/>
+  <path d="M 13.7 23 L 15.3 24.6 L 18.3 21.6" fill="none" stroke="var(--pm-paper)" stroke-width="1.9" stroke-linecap="square"/>
+</svg>

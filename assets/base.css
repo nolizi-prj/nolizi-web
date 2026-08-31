@@ -224,6 +224,7 @@ h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus-visible { op
 .card { display: flex; flex-direction: column; gap: var(--space-2xs); overflow: hidden; }
 .card .badge { align-self: flex-start; }
 .card-art svg { width: 100%; height: auto; display: block; }
+.card-mark img { width: var(--mark-size); height: var(--mark-size); display: block; }
 .card-limitation { margin-top: auto; }
 
 .post-list { list-style: none; padding: 0; display: grid; gap: var(--space-md); }

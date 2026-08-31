@@ -201,9 +201,40 @@ test("the theme is linked before the structural layer that reads its tokens", ()
   }
 });
 
-test("illustrations are inline and theme-aware, not linked images", () => {
+test("illustrations are inline and theme-aware", () => {
   const home = byPath.get("index.html") as string;
   assert.match(home, /<svg[^>]*viewBox/, "the home page has no inline illustration");
   assert.match(home, /var\(--art-/, "illustrations do not use theme tokens");
-  assert.doesNotMatch(home, /<img /, "an <img> cannot follow the colour scheme");
+});
+
+/**
+ * This assertion used to be `doesNotMatch(/<img /)`, on the reasoning that an
+ * `<img>` cannot follow the colour scheme. That is true of an image that does
+ * not try to: a custom property does not cross into an `<img>`'s own document.
+ * A brand mark carries its own `prefers-color-scheme` block and its own
+ * literals for exactly this reason, so it does follow the scheme — and the
+ * blanket ban would have kept the marks off the page rather than keeping bad
+ * images off it. The rule is now the property that was actually wanted.
+ */
+test("a linked image is either a themed brand mark or a screenshot", async () => {
+  for (const [path, contents] of byPath) {
+    if (!path.endsWith(".html")) continue;
+    for (const m of (contents as string).matchAll(/<img [^>]*src="([^"]+)"/g)) {
+      const src = m[1] as string;
+      // A screenshot is evidence of what the software actually renders. It
+      // cannot follow the reader's scheme and it is not supposed to: repainting
+      // a screenshot would make it stop being evidence.
+      if (src.startsWith("/screenshots/")) continue;
+
+      // Everything else is a drawing, and a drawing follows the page.
+      assert.match(src, /^\/brand\/[a-z-]+\.svg$/, `${path} links ${src}, which is neither a brand SVG nor a screenshot`);
+      const svg = await readFile(join("assets", src.replace(/^\//, "")), "utf8");
+      assert.match(
+        svg,
+        /@media \(prefers-color-scheme: dark\)/,
+        `${src} is linked as an <img> but has no dark scheme, so it cannot follow the page`,
+      );
+      assert.match(svg, /var\(--[a-z-]+, #[0-9a-f]{6}\)/, `${src} has no literal fallback for the <img> case`);
+    }
+  }
 });
