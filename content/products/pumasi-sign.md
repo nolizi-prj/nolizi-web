@@ -4,9 +4,9 @@ description: "An unmetered, legally-binding B2B e-signature platform. Determinis
 compareTo: [DocuSign, SignWell]
 status: alpha
 repo: "https://github.com/pumasi-ai/pumasi-sign"
-limitation: "**a `priority: high` defect is open on the entry path** — [issue #7](https://github.com/pumasi-ai/pumasi-sign/issues/7): pressing *sign in again* returns an error. Reported 2026-08-31 01:14 UTC, still open, and **reproduced against the Cloudflare Worker that actually serves `sign.pumasi.ai`** on 2026-08-31 at 21:33 UTC: `curl -s -i 'https://sign.pumasi.ai/api/auth/login?next=%2F'` returns `HTTP/2 404` and `{"error":"Endpoint not found"}`. A signed-out user who presses *Sign in again* is handed that error JSON raw. The cause is that the button is a full-page navigation to a route only `backend/` defines — `@router.get("/login")` under prefix `/api/auth` at `backend/app/routers/auth.py:82` — while the worker defines no `GET` there at all, only `POST /api/auth/login/request` (`service/src/durable.ts:775`) and `POST /api/auth/login/verify` (`:798`). **A reviewed fix is merged and is not deployed** — [`d18d534`](https://github.com/pumasi-ai/pumasi-sign/commit/d18d534), written up in [this release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-sign-sign-in-again.md) (`pumasi/DECISIONS.md` **Q-027**, veto window to 2026-09-07) — so the warning above is about `sign.pumasi.ai` and not about `main`, and the `404` was re-measured *after* that merge. See *fixed in source, still wrong in production*, below. This is live for real users and not merely true of `main`: the deployed chunk `/assets/SignedOutView-Cw4c846h.js` builds the button's `href` from the `loginRedirectUrl` helper exported by the shipped `/assets/index-j38Qwibz.js`, which returns exactly that 404 path. The earlier report that sign-up and sign-in were broken outright ([#9](https://github.com/pumasi-ai/pumasi-sign/issues/9)) was **closed `not planned` on 2026-08-31 16:04 UTC**, on evidence that the `403` in it came from a different product — so the front door is not known to be shut, and #7 is the one to know about. Separately, this repository is public and carries **no `LICENSE` file** on its default branch (`gh api repos/pumasi-ai/pumasi-sign/contents/LICENSE` → **404**, checked 2026-08-31), so a self-hoster has no grant of rights yet; that is open as `pumasi/DECISIONS.md` Q-021 and this page states no licence until it lands. And the audit certificates verify document integrity, signer identity and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not included."
+limitation: "**this product's own front page went live on 2026-09-01 and it tells a stranger, three times, that the code is under Apache-2.0 — and the repository grants no licence at all.** Measured on the served landing chunk `/assets/LandingView-C5khdw3s.js` (`200`, 10 046 bytes, fetched 2026-09-01 02:40 UTC): `Apache-2.0` appears in the hero strip, in the stage banner, and in a comparison-table row headed *License & Source Code* whose neighbouring columns both read *Proprietary Closed Source* — a row that invites a reader to choose this product **because** of terms that do not exist. Against that, `gh api repos/pumasi-ai/pumasi-sign/contents/LICENSE` returns **404** (checked 2026-09-01), and a public repository with no licence grants no rights at all: you may read the code, and you have no permission to run, modify or redistribute it. Which way that resolves is the steward's, open as `pumasi/DECISIONS.md` **Q-021**, and **this page states no licence until it lands** — it reports the deployed page's claim rather than repeating it. **The entry-path defect this card warned about for two days is gone.** [Issue #7](https://github.com/pumasi-ai/pumasi-sign/issues/7) — *sign in again* handed the user a page of raw JSON — was **closed 2026-09-01T00:59:12Z**, and the repair reached users in the deploy at **2026-09-01 01:02:16 UTC**; verified on the live host rather than on the tracker, the button now builds `/login?next=%2F`, which answers `200 text/html`. And the audit certificates verify document integrity, signer identity and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not included."
 order: 2
-updated: 2026-08-31
+updated: 2026-09-01
 ---
 
 ## Where this actually is
@@ -20,23 +20,41 @@ It comes from the product's own register:
 first published 2026-08-31 at
 [`6e02cc4`](https://github.com/pumasi-ai/pumasi-sign/commit/6e02cc4), which
 records `alpha` **set on measured evidence** — not on aspiration, and not on a
-chip. Its gate table, verbatim:
+chip. Read here at
+[`3edd06f`](https://github.com/pumasi-ai/pumasi-sign/commit/3edd06f) — its
+ladder, with the status that file's own exit-gate section gives each rung:
 
 | Stage | Criteria | Status |
 | :--- | :--- | :--- |
 | **0 · Candidate** | Steward selection | **COMPLETE** — built and deployed |
-| **1 · Alpha** | Pure-core suite passes 100%; **both** public landing surfaces live | **IN PROGRESS** — Surface A live, Surface B undeployed |
+| **1 · Alpha** | Pure-core suite passes 100%; **both** public landing surfaces live | **NOT MET** — both surfaces are live as of 2026-09-01; the gate is held on whether Surface B is *honestly calibrated*, and one of its claims is untrue |
 | **2 · Beta** | Real end-to-end users complete workflows without engineer intervention | PENDING |
 | **3 · Launched** | Production hardening, cross-model regression, 7-day veto window | PENDING |
 
 Read that row 1 carefully, because it is the unusual part: **the stage is
-`alpha` and `alpha`'s own exit gate is NOT MET.** Surface A is this page.
-Surface B — the product's own root landing page at `sign.pumasi.ai` — is merged
-on `main` and not deployed: the live bundle `/assets/index-j38Qwibz.js` was
-fetched at 839 941 bytes containing **zero occurrences of `landing`**
-(`STAGE.md` §2.2, issue
-[#8](https://github.com/pumasi-ai/pumasi-sign/issues/8)). The remaining work
-there is a deploy, not a build.
+`alpha`, `alpha`'s own exit gate is NOT MET, and on 2026-09-01 the reason
+changed completely while the two words stayed the same.** Surface A is this
+page. Surface B — the product's own root landing page at `sign.pumasi.ai` — is
+**live**, deployed at **2026-09-01 01:02:16 UTC**. Issue
+[#8](https://github.com/pumasi-ai/pumasi-sign/issues/8), which tracked its
+absence, was closed three minutes before that at **2026-09-01T00:59:11Z** — the
+tracker moved first and the deploy is what made it true. Through five
+evaluations the unmet half of this gate was *Surface B is not live*. It is now
+**Surface B is live and one of its claims is untrue** — the licence claim, set
+out below. On the gate's literal words the
+row now reads met; the register declines to record it as met, because Stage 1
+asks that second surface for honest calibration and a surface is not honestly
+calibrated while one of its claims is a licence grant a stranger may act on.
+**What flips this row is a steward answering Q-021, not a build** — and not
+this page.
+
+**One disclosure about the register itself, because you can open it and would
+otherwise conclude this card is the stale one.** At `3edd06f`, `STAGE.md`'s own
+gate *table* still carries its pre-deploy wording — Surface B *"has never been
+deployed"* — while that same file's exit-gate section, its §2.2 and its §5 all
+record the deployment, date it to the second, and quote the live route table.
+This card follows the parts that show the measurement. The row is that file's
+to correct, not this one's.
 
 **An earlier version of this page said `seed`, and said in bold that
 `pumasi-sign` had no `roadmap/STAGE.md`.** Both were true on the day it was
@@ -51,8 +69,11 @@ them — which is what `STAGE.md` §5 asks for by name.
   [`pumasi/catalog.json`](https://github.com/pumasi-ai/pumasi/blob/main/catalog.json)
   records this product at `"status": "seed"` in both its arrays — one rung
   below what its own register now says, and `seed` is not a rung on the
-  product-manager role file's ladder at all. Read directly at `pumasi` @
-  `a76aa3c`, the file is not merely stale but **internally inconsistent**:
+  product-manager role file's ladder at all. Re-read for this card at `pumasi`
+  @ `2ab3a4f` on 2026-09-01 and unchanged, down to a top-level `updated` of
+  `2026-08-29` — three days stale, across the tick in which this product
+  deployed its front page. The file is not merely stale but **internally
+  inconsistent**:
   `products[]` keys both products on `"status"`, while in `items[]`
   `pumasi-sign` uses `"status"` and `pumasi-booking` uses `"maturity"` —
   adjacent entries, same concept, two key names, both reading `seed`. That is
@@ -61,62 +82,74 @@ them — which is what `STAGE.md` §5 asks for by name.
   `pumasi/DECISIONS.md` **Q-019**, whose named default is a role-file amendment
   nobody has made — and this page may not edit it. Whoever inherits it inherits
   a schema question as well as a content one.
-- **The register says a `BETA` chip is live in production. It is not, and
-  neither is the page it was on.** The chip was real — `v-chip … BETA` at
-  `frontend/src/views/LandingView.vue:34` as of
-  [`d797c81`](https://github.com/pumasi-ai/pumasi-sign/commit/d797c81) — and
-  it is gone from source: at `main` @
-  [`2bd3ba7`](https://github.com/pumasi-ai/pumasi-sign/commit/2bd3ba7), eleven
-  commits later, `grep -c BETA frontend/src/views/LandingView.vue` returns
-  **`0`**. That view now derives its badge from
+- **The `BETA` chip this card and the register argued about for two days is
+  settled, and the deploy is what settled it.** The chip was real — `v-chip …
+  BETA` at `frontend/src/views/LandingView.vue:34` as of
+  [`d797c81`](https://github.com/pumasi-ai/pumasi-sign/commit/d797c81) — and it
+  was replaced by a badge derived from
   [`frontend/src/stage.ts`](https://github.com/pumasi-ai/pumasi-sign/blob/main/frontend/src/stage.ts),
-  which exports `STAGE = "alpha"` (`:25`) and `STAGE_BADGE = "ALPHA — ACTIVE
-  DEVELOPMENT"` (`:35`), under a comment at `:11` naming `roadmap/STAGE.md` as
-  the register — the same file this card reads.
+  under a comment naming `roadmap/STAGE.md` as the register — the same file
+  this card reads. **That is the version that went live.** Read out of the
+  served landing chunk on 2026-09-01 at 02:40 UTC, the constant and the badge
+  it generates are there in one expression:
 
-**An earlier version of this page repeated that chip as current. It was wrong,
-and correcting it turned up something better than the correction.**
+  ```js
+  var g=`alpha`,_=g.charAt(0).toUpperCase()+g.slice(1),v=`${g.toUpperCase()} — ACTIVE DEVELOPMENT`
+  ```
 
-`STAGE.md` §5 introduces a distinction this site should have had a name for
-long ago: a claim can be **wrong in source and in production**, **right in
-both**, or **fixed in source and still wrong in production**. That third state
-is what makes a repository read as finished while a user meets the old
-behaviour, and it is the direct, named cost of
+  `grep -c BETA` on that chunk returns **`0`**. So the badge a stranger reads
+  is `ALPHA — ACTIVE DEVELOPMENT`, generated from the rung the register sets,
+  and **no user has ever seen a `BETA` badge on this product** — the argument
+  was about a page nobody could yet open.
+
+**This page spent two days arguing about that chip. The argument was worth
+more than the answer, because of the vocabulary it forced into existence.**
+
+`STAGE.md` §5 keeps a four-state ledger for every claim this project makes.
+A claim can be **wrong in source and in production**; **right in both**;
+**fixed in source and still wrong in production** — the state that makes a
+repository read as finished while a user keeps meeting the old behaviour, and
+the direct, named cost of
 [`pumasi/DECISIONS.md`](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)
-**Q-012** — *who deploys a merged fix, and by when* — which is open, with its
-default (the coder deploys as the last step of the job that merged) unclaimed.
+**Q-012**, *who deploys a merged fix, and by when*, still open with its default
+unclaimed; or **merged and never shipped** — present on `main` and absent from
+every deployment there has ever been. That fourth state was added because of
+this product's landing page, and this card's own bundle readings are cited in
+that file as the measurement that forced the row.
 
-**§5 filed the `BETA` chip under that third state. This page measured
-production and could not confirm it.** Read live on **2026-08-31 at 18:49 UTC**,
-`https://sign.pumasi.ai/` serves `/assets/index-j38Qwibz.js` — `HTTP 200`,
-**839 941 bytes**, **zero occurrences of `landing`**, zero of `BETA`, and zero
-of `ALPHA` (every `alpha` in it is library noise: `globalAlpha`, `alphaSlider`,
-the CSS keyword `lower-alpha`). Its route table maps `/` to **`dashboard`**,
-and among the fourteen lazy-loaded view chunks it does ship there is no
-`LandingView` at all. So the chip is not showing users a stale stage; **nothing in `LandingView.vue` has
-ever reached a user**, because Surface B has never deployed. The chip was
-removed from a page production has never had.
+**On 2026-09-01 the page shipped, and the ledger moved in one motion.** Until
+that morning every sentence in `LandingView.vue` sat in the fourth state:
+unshipped, and therefore harmless. The 01:02:16 UTC deploy took all of them
+public at once — `service/wrangler.jsonc` serves `frontend/dist` as a single
+`ASSETS` directory, so there is no shipping one claim and holding another. The
+page had carried **three** claims the repository could not back. Two were
+repaired before it went out: the `BETA` chip, which shipped reading `ALPHA`,
+and an uncited competitor-pricing block, which shipped cited and dated, linking
+both vendors' own pages. **The third shipped unrepaired, and it is the
+licence claim** — which moved from *merged and never shipped* straight to
+*wrong in source and in production*, the worst square on the board.
 
-The distinction matters more than the pedantry suggests. A fix that is merged
-and undeployed is a real defect with a known remedy — ship it. A file that has
-never deployed at all is not one deploy behind on one chip; **every claim in
-it** is unshipped, including the `Apache-2.0` line at `LandingView.vue:43`,
-`:80` and `:210` that the repository still cannot support. Filing this under
-"fixed in source, live in production" makes the remedy sound like a deploy of a
-correction, when it is the first deploy of the page.
+That difference is the whole reason this site keeps the vocabulary. **An
+unshipped false claim is a bug report. The same claim, deployed, is something a
+stranger can act on** — and the deployed one here is a grant of rights, in a
+table row whose neighbouring columns say *Proprietary Closed Source*, on a
+repository that grants none. The two could not be separated at deploy time,
+which is what **Q-028** was raised to record; it did not get answered so much
+as overtaken, resolving itself by shipping.
+
+**The one thing the deploy made unambiguously better is worth naming**, because
+everything else it did was move a claim from private to public: the repository
+can no longer disagree with the register about the rung. The badge is generated
+from `STAGE.md`, and a frozen case in that repository fails the build if the
+two drift apart. The stage word on the live page is right today by construction
+rather than by luck — which is the only kind of right that survives the next
+deploy nobody announces.
 
 Where a file disagrees with `STAGE.md`, this page follows `STAGE.md` — not
 because it is higher or lower, but because it is the one that shows its
-evidence and names its falsifiers. **That cut both ways, and the register
-moved.** At
-[`38ba661`](https://github.com/pumasi-ai/pumasi-sign/commit/38ba661) §5 adds a
-**fourth** state — *merged and never shipped*, present on `main` and absent
-from every deployment there has ever been — files the chip and every other
-`LandingView.vue` claim under it including the `Apache-2.0` lines, and records
-this page's own 18:49 UTC bundle reading as the measurement that forced the
-row. The third state is not empty either: it acquired its first real occupant
-the same day, and that occupant is issue #7 below. A register that hands you
-the tool to check it, and then takes the answer, is doing its job.
+evidence and names its falsifiers. Where `STAGE.md` disagrees with *itself*, as
+its gate table does today, this page follows the half that shows the
+measurement, and says which half that was.
 
 ## Run it
 
@@ -191,16 +224,37 @@ product carries the file — `pumasi-tunnel`, Apache License 2.0, as does this
 website's own repository — so this reads as an omission rather than a position
 taken.
 
-**A note for anyone checking this themselves, because the obvious command
-lies.** `gh repo view --json licenseInfo` returns `null` for *every* repository
-in this organisation, including `pumasi-tunnel` and `pumasi-web`, which
-demonstrably do carry an Apache-2.0 `LICENSE`. GitHub's licence detection is
-not populating here, so a `null` there is not evidence of absence — it is no
-evidence at all. The check that actually distinguishes the two cases is asking
-the default branch for the file, above. This matters beyond this page: the
+**What changed on 2026-09-01 is not the licence. It is who is being told.**
+Until that morning this was an internal question about an undeployed page.
+At **01:02:16 UTC** the product's own landing page went live carrying
+`Apache-2.0` in three separate claims — the hero strip, the stage banner, and a
+comparison-table row headed *License & Source Code* whose neighbouring columns
+read *Proprietary Closed Source*. That row's entire purpose is to invite a
+reader to choose this product **because** its terms differ from the
+incumbents', and the terms it names do not exist. Q-021's own framing — *not
+yet public, which is the whole reason this is a question and not an incident* —
+is overtaken by that deploy. **This card reports the claim; it does not repeat
+it**, and one surface saying something untrue is a mistake that two surfaces
+would make a pattern.
+
+**A note for anyone checking this themselves, because the obvious command was
+lying until recently and this page said so.** Through 2026-08-31,
+`gh repo view --json licenseInfo` returned `null` for *every* repository in
+this organisation, including `pumasi-tunnel` and `pumasi-web`, which
+demonstrably do carry an Apache-2.0 `LICENSE` — so a `null` there was not
+evidence of absence, it was no evidence at all. **Re-checked on 2026-09-01,
+that is no longer true**: GitHub's detection has caught up and now reports
+`{"key":"apache-2.0"}` for both of those repositories, and `null` for
+`pumasi-sign`.
+
+The conclusion is unchanged and the reasoning is worth keeping anyway. That
 `null` is the evidence cited in `pumasi-sign`'s own `STAGE.md` §2.3 and in
-Q-021, where the *conclusion* is right and independently confirmed by the 404,
-but the *test* would have read the same for a correctly licensed repository.
+Q-021, and on the day it was cited it would have read identically for a
+correctly licensed repository — a test that cannot fail is not a check.
+It happens to be corroborated now, which is luck rather than method. **The
+question the file answers is still the one to ask**: `gh api
+repos/pumasi-ai/pumasi-sign/contents/LICENSE` → `404`, above, re-run for this
+card on 2026-09-01.
 
 **Which of those it is, is not this page's call.** It is open as
 [`pumasi/DECISIONS.md`](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)
@@ -231,49 +285,75 @@ anywhere in `service/src/`, its `establishSession`
 any verified email address, and the reporter's exact wording occurs once in the
 whole fleet — in a different product.
 
-**What is still open is narrower, and is the thing to know before you rely on
-this**: [#7](https://github.com/pumasi-ai/pumasi-sign/issues/7),
-`priority: high`, an error on *sign in again*. It has been reproduced against
-the live worker and diagnosed — the button navigates to `/api/auth/login`, a
-route only `backend/` defines, and the worker answers `404` (`STAGE.md` §2.2)
-— and **it has since been repaired on `main` and not deployed**, which is the
-third of the four states above and this product's first real occupant of it.
-The repository and the deployment are two different things here, and this page
-says which is which rather than letting the repository take credit for the
-product:
+**The defect this page carried at the top for two days is closed, and it is
+worth a line rather than a silent deletion.**
+[#7](https://github.com/pumasi-ai/pumasi-sign/issues/7), `priority: high`: a
+person who signed out saw one button, *Sign in again*, and pressing it handed
+them `{"error":"Endpoint not found"}` rendered raw as a document. It was
+**closed 2026-09-01T00:59:12Z**, and — the part that matters, because closing
+an issue serves nobody by itself — the repair **reached users** in the deploy
+at **2026-09-01 01:02:16 UTC** — three minutes after the tracker said so, not
+before. Alongside it,
+[#8](https://github.com/pumasi-ai/pumasi-sign/issues/8), the app root having no
+product page in production, was **closed 2026-09-01T00:59:11Z** and made true
+by the same deploy.
 
-| | `main`, the repository | `sign.pumasi.ai`, what you can open today |
-|---|---|---|
-| The *Sign in again* button | targets the app's own `/login`, through the `loginPageUrl` helper the `401` handler already used; the helper that built the broken URL is deleted — merged at [`d18d534`](https://github.com/pumasi-ai/pumasi-sign/commit/d18d534) | still a full-page navigation to `/api/auth/login` |
-| What a signed-out user gets from it | the sign-in page | `HTTP/2 404` · `{"error":"Endpoint not found"}`, rendered raw as a document — **re-measured 2026-08-31 21:33 UTC** |
-| Issue [#7](https://github.com/pumasi-ai/pumasi-sign/issues/7) | the build is done and retired from the build order | **still open, on purpose — the user is not served** |
+**Verified on the live host rather than on the tracker**, 2026-09-01 02:40 UTC:
 
-The repair is written up in
-[the release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-sign-sign-in-again.md),
-a can-hurt note whose own first line is *"It is merged and it is **not
-deployed**"* —
+```console
+$ curl -s https://sign.pumasi.ai/ | grep -o '/assets/index-[^"]*\.js'
+/assets/index-CnoFAC2c.js
+
+$ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' \
+    'https://sign.pumasi.ai/login?next=%2F'
+200 text/html
+```
+
+The served `SignedOutView-C2J9s3yp.js` builds that button's target by calling
+the main bundle's exported helper with `/`, and the helper is
+``function ml(e){return`/login?next=`+encodeURIComponent(e)}``. Decisively, the
+helper that built the broken URL is **gone from the shipped JavaScript**:
+`grep -c '/api/auth/login?next=' index-CnoFAC2c.js` returns **`0`**.
+
+**One thing not to over-read, because the obvious check still looks alarming.**
+`GET /api/auth/login?next=%2F` on that host **still answers `404`** — and that
+is now correct behaviour rather than a defect. Nothing targets it any more. A
+route that never existed on the worker returning `404` is a server doing its
+job; the defect was a button pointing at it, and the button no longer does.
+
+**What has not changed is the thing underneath both issues: nobody owns
+deployment.** That is **Q-012**, open, exactly as on the sibling
+[Pumasi Booking](/products/pumasi-booking/) card. This deploy was not announced
+in any queue and matches no release note; it had to be identified from the
+artefact, which `STAGE.md` §2.2 does by chunk fingerprint, landing on
+[`0e26917`](https://github.com/pumasi-ai/pumasi-sign/commit/0e26917) — built
+from a working tree five seconds *before* that commit's own timestamp. **And
+`main` has already moved past it again**, including
+[`2471a29`](https://github.com/pumasi-ai/pumasi-sign/commit/2471a29), which
+changes `service/src/worker.ts`, `service/src/durable.ts` and
+`service/wrangler.jsonc`. So the repository is ahead of the deployment once
+more, and nothing carries one to the other. **Someone deployed; the question of
+who owes you the next one is still open.**
+
+The sign-in repair is written up in
+[a release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-sign-sign-in-again.md)
+whose own first line reads *"It is merged and it is **not deployed**"* — a
+can-hurt release under
 [`DECISIONS.md` **Q-027**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
-veto window to 2026-09-07, which the steward has yet to confirm.
+veto window to 2026-09-07, which the steward has yet to confirm. That note is
+written in the present tense and describes the branch on the day it was
+published; the deployment has since overtaken it. **Read a release note as a
+claim about the repository and check the deployment separately** — and note
+what the window now means: seven days to veto a change users already have.
 
-**Why it has not shipped is not only that nobody owns deployment.** That part
-is **Q-012**, open, exactly as on the sibling
-[Pumasi Booking](/products/pumasi-booking/) card. But this fix is a *frontend*
-change, and `service/wrangler.jsonc` serves `frontend/dist` as a single
-`ASSETS` directory — so the one build that would carry the repair to a user
-also publishes `LandingView.vue`'s "Apache-2.0 (Open Source)" line from the
-repository that carries no `LICENSE`, the section above. The two cannot be
-separated at deploy time, and that is open as **Q-028**, whose named default is
-that they ship together or not at all. So a live defect's repair is waiting on
-a licence question, and the person who reported #7 keeps meeting the JSON. That
-is the cost of an open decision, stated rather than absorbed.
-
-Where #7 sits in the build order is a question for
+What is queued next is a question for
 [`roadmap/BACKLOG.md`](https://github.com/pumasi-ai/pumasi-sign/blob/main/roadmap/BACKLOG.md),
 and **this page quotes no rank from it.** That file was reordered three times on
 2026-08-31 alone; a rank in prose is the same kind of cache as a test count, and
 the one this page used to publish was spent before you read it. Read the file.
-See *Before you use it* at the top of this page. The local `wrangler dev` route
-above is unaffected by either report.
+See *Before you use it* at the top of this page for what is still worth knowing
+before you rely on this — it is now the licence, not the front door. The local
+`wrangler dev` route above is unaffected by any of it.
 
 ### 1. Document Dashboard & Action Queue
 Manage incoming signature requests, active contracts, and completed envelopes in one centralized view:
@@ -300,7 +380,7 @@ External signers receive secure tokenized links with 6-digit email verification 
 Pumasi Sign is built to run at the edge with zero dedicated container overhead:
 - **Pure JavaScript / WebAssembly PDF Engine**: PDF parsing and stamping execute inside Cloudflare V8 isolates with zero C++ or heavy OS binary dependencies.
 - **Transactional SQLite Storage**: Envelopes, signers, templates, and document blobs are stored in transactional Cloudflare Durable Objects.
-- **Custom Domain Deployment**: Deployed globally at `sign.pumasi.ai`, which answers `200` on `/api/health`. The live bundle is several commits behind `main` and does not yet carry the product's own landing page ([#8](https://github.com/pumasi-ai/pumasi-sign/issues/8)) — which is why `alpha`'s exit gate above reads **NOT MET**, and why this catalog card is the only public surface this product currently has.
+- **Custom Domain Deployment**: Deployed globally at `sign.pumasi.ai`, which answered `200` on `/api/health` when this card was written (2026-09-01 02:40 UTC). Since **2026-09-01 01:02:16 UTC** that host also serves the product's own landing page at `/` ([#8](https://github.com/pumasi-ai/pumasi-sign/issues/8), closed), so this catalog card is no longer the only public surface this product has. The live bundle is still behind `main`, and `alpha`'s exit gate above still reads **NOT MET** — for what that landing page says, no longer for its absence.
 
 **One thing this section cannot tell you yet, and says so rather than
 implying otherwise.** `sign.pumasi.ai` is served by the Cloudflare Worker in
@@ -337,11 +417,14 @@ about what you would meet at that domain — and run
 [33420378497](https://github.com/pumasi-ai/pumasi-sign/actions/runs/33420378497)
 shows exactly how. At `ef851d6` it is green on **all four** jobs — `backend`,
 `frontend`, `service`, `e2e` — while the *Sign in again* button on this
-product's own signed-out page returned `404` in production, measured above at
-18:49 UTC the same day. The `e2e` job is the one to sit with: it is green
+product's own signed-out page was returning `404` in production, measured from
+this card at 18:49 UTC that same day and not repaired for users until the
+deploy at **2026-09-01 01:02:16 UTC**. **Four green jobs sat above a live
+entry-path defect for the better part of a day**, and that is the argument
+rather than the anecdote. The `e2e` job is the one to sit with: it is green
 **because** `frontend/playwright.config.ts` drives `backend/` — locally a
 `uvicorn` process, in CI a container built from the root `Dockerfile`, and both
-are `backend/`, the one tree in which `GET /api/auth/login` exists. Six
+are `backend/`, the one tree in which `GET /api/auth/login` exists. Its
 Playwright specs exercise a sign-in path that works, on a server no user
 reaches, and would keep passing however long the defect stayed live
 (`STAGE.md` §2.1).
