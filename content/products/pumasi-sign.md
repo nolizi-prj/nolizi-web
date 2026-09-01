@@ -4,7 +4,7 @@ description: "An unmetered, legally-binding B2B e-signature platform. Determinis
 compareTo: [DocuSign, SignWell]
 status: alpha
 repo: "https://github.com/pumasi-ai/pumasi-sign"
-limitation: "**this product's own front page went live on 2026-09-01 and it tells a stranger, three times, that the code is under Apache-2.0 — and the repository grants no licence at all.** Measured on the served landing chunk `/assets/LandingView-C5khdw3s.js` (`200`, 10 046 bytes, fetched 2026-09-01 02:40 UTC): `Apache-2.0` appears in the hero strip, in the stage banner, and in a comparison-table row headed *License & Source Code* whose neighbouring columns both read *Proprietary Closed Source* — a row that invites a reader to choose this product **because** of terms that do not exist. Against that, `gh api repos/pumasi-ai/pumasi-sign/contents/LICENSE` returns **404** (checked 2026-09-01), and a public repository with no licence grants no rights at all: you may read the code, and you have no permission to run, modify or redistribute it. Which way that resolves is the steward's, open as `pumasi/DECISIONS.md` **Q-021**, and **this page states no licence until it lands** — it reports the deployed page's claim rather than repeating it. **The entry-path defect this card warned about for two days is gone.** [Issue #7](https://github.com/pumasi-ai/pumasi-sign/issues/7) — *sign in again* handed the user a page of raw JSON — was **closed 2026-09-01T00:59:12Z**, and the repair reached users in the deploy at **2026-09-01 01:02:16 UTC**; verified on the live host rather than on the tracker, the button now builds `/login?next=%2F`, which answers `200 text/html`. And the audit certificates verify document integrity, signer identity and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not included."
+limitation: "**two defects are live on `sign.pumasi.ai` as this is written, both repaired in `main` and neither deployed.** Re-measured on the live hosts and the deployed tree 2026-09-01 05:20:32–05:22:52 UTC, at this seat's own clock rather than carried from an earlier one; the served root still loads `/assets/index-CnoFAC2c.js`, the fingerprint `STAGE.md` §2.2 maps to the deployed tree [`0e26917`](https://github.com/pumasi-ai/pumasi-sign/commit/0e26917), and `wrangler.jsonc` ships the worker and `frontend/dist` as one artefact. **(1) The *correct expiration & reminders* pencil silently deletes the covering note you wrote to your signers.** The served `EnvelopeDetailView-C4VlFBtA.js` PATCHes exactly three fields — `expires_at`, `reminders_enabled`, `reminder_interval_days` — never `message`, then reports *Envelope settings updated.*; at `0e26917` `durable.ts:1211` writes `NULL` to `message` on any body that omits it. **Messages already deleted are gone** — the release note says so in the sender's own words, and the deployed tree stores no prior value to read back: the `UPDATE` overwrites the column and the `corrected` audit row at `durable.ts:1214` carries no `details_json`. Repaired at [`9659e69`](https://github.com/pumasi-ai/pumasi-sign/commit/9659e69), [release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-09-01-pumasi-sign-message-survives-settings.md) — **Q-037**, and the window that entry's own row records closes 2026-09-08. **(2) An expiration date does nothing.** The served `ExternalSignView-CmDSqiPb.js` carries four closed-envelope cases and no expired one, and at `0e26917` there is no `crons` key, no `scheduled` export and no `expires_at` write on that route — so nothing expires, and the only refusal is **client-side**, in `SignView-BM1dkPaZ.js`, beside a source comment (`SignView.vue:480` at `0e26917`) claiming the server rejects `/complete` the same way when at that commit it does not. Repaired at [`2471a29`](https://github.com/pumasi-ai/pumasi-sign/commit/2471a29), [release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-09-01-pumasi-sign-expiration-dates-bind.md) — **Q-035**, and the window that entry's own row records closes 2026-09-08. **Both are merged and undeployed, and this page does not claim either has shipped**: nobody owns deployment — `pumasi/DECISIONS.md` **Q-012**, open, and outside CHARTER Part 0's proceed-on-default rule. Separately, **this product's own front page went live on 2026-09-01 and it tells a stranger, three times, that the code is under Apache-2.0 — and the repository grants no licence at all.** Measured on the served landing chunk `/assets/LandingView-C5khdw3s.js` (`200`, 10 046 bytes, re-fetched 2026-09-01 05:22:14 UTC): `Apache-2.0` appears in the hero strip, in the stage banner, and in a comparison-table row headed *License & Source Code* whose neighbouring columns both read *Proprietary Closed Source* — a row that invites a reader to choose this product **because** of terms that do not exist. Against that, `gh api repos/pumasi-ai/pumasi-sign/contents/LICENSE` returned **404** at 2026-09-01 05:22:52 UTC — the contents API, which is the check that answers whether the file exists, rather than the `licenseInfo` field, which has been wrong about this organisation before, and a public repository with no licence grants no rights at all: you may read the code, and you have no permission to run, modify or redistribute it. Which way that resolves is the steward's, open as `pumasi/DECISIONS.md` **Q-021**, and **this page states no licence until it lands** — it reports the deployed page's claim rather than repeating it. **The entry-path defect this card warned about for two days is gone.** [Issue #7](https://github.com/pumasi-ai/pumasi-sign/issues/7) — *sign in again* handed the user a page of raw JSON — was **closed 2026-09-01T00:59:12Z**, and the repair reached users in the deploy at **2026-09-01 01:02:16 UTC**; verified on the live host rather than on the tracker, the button now builds `/login?next=%2F`, which answers `200 text/html`. And the audit certificates verify document integrity, signer identity and UTC timestamps under the ESIGN Act and eIDAS, but Qualified Electronic Signatures (QES) requiring national hardware smartcards are not included."
 order: 2
 updated: 2026-09-01
 ---
@@ -21,7 +21,8 @@ first published 2026-08-31 at
 [`6e02cc4`](https://github.com/pumasi-ai/pumasi-sign/commit/6e02cc4), which
 records `alpha` **set on measured evidence** — not on aspiration, and not on a
 chip. Read here at
-[`3edd06f`](https://github.com/pumasi-ai/pumasi-sign/commit/3edd06f) — its
+[`f0d1912`](https://github.com/pumasi-ai/pumasi-sign/commit/f0d1912), which is
+what `origin/main` answered when this card fetched it on 2026-09-01 — its
 ladder, with the status that file's own exit-gate section gives each rung:
 
 | Stage | Criteria | Status |
@@ -48,13 +49,23 @@ calibrated while one of its claims is a licence grant a stranger may act on.
 **What flips this row is a steward answering Q-021, not a build** — and not
 this page.
 
-**One disclosure about the register itself, because you can open it and would
-otherwise conclude this card is the stale one.** At `3edd06f`, `STAGE.md`'s own
-gate *table* still carries its pre-deploy wording — Surface B *"has never been
+**A correction to what this card said yesterday, because the file it pointed you
+at has moved.** Through `3edd06f` this card disclosed that `STAGE.md`'s gate
+*table* still carried its pre-deploy wording — Surface B *"has never been
 deployed"* — while that same file's exit-gate section, its §2.2 and its §5 all
-record the deployment, date it to the second, and quote the live route table.
-This card follows the parts that show the measurement. The row is that file's
-to correct, not this one's.
+recorded the deployment, dated it to the second, and quoted the live route
+table, and it closed *"The row is that file's to correct, not this one's."*
+**That row is corrected**, at
+[`3f51fa1`](https://github.com/pumasi-ai/pumasi-sign/commit/3f51fa1), with two
+non-builder approvals recorded at
+[`f0d1912`](https://github.com/pumasi-ai/pumasi-sign/commit/f0d1912) — verified
+by this card against a freshly fetched `origin/main` on 2026-09-01. The Stage 1
+row now opens *"IN PROGRESS — NOT MET, and the unmet half is Surface B's
+**honesty**, not its existence"* and says in its own words which pass corrected
+it. **So `STAGE.md` no longer disagrees with itself, and if you open it looking
+for the contradiction this card used to name, you will not find one.** The
+verdict did not move: the gate is `NOT MET` for the reason the row above gives,
+and the correction was to the row's *wording*, not to the gate.
 
 **An earlier version of this page said `seed`, and said in bold that
 `pumasi-sign` had no `roadmap/STAGE.md`.** Both were true on the day it was
@@ -147,9 +158,176 @@ deploy nobody announces.
 
 Where a file disagrees with `STAGE.md`, this page follows `STAGE.md` — not
 because it is higher or lower, but because it is the one that shows its
-evidence and names its falsifiers. Where `STAGE.md` disagrees with *itself*, as
-its gate table does today, this page follows the half that shows the
-measurement, and says which half that was.
+evidence and names its falsifiers. **Where `STAGE.md` disagreed with *itself*,
+as its gate table did until `3f51fa1`, this page followed the half that showed
+the measurement and said which half that was — and that rule is recorded here
+because it was used, not because it is needed today.** The two halves agree
+now.
+
+## Two defects are live on the hosted service, and both repairs are waiting
+
+**If you are about to send an agreement through `sign.pumasi.ai`, read this
+before the licence section below.** Two release notes were published on
+2026-09-01 **eighty-three minutes apart** — `pumasi` `14d8af4` at 01:41:04 UTC
+and `df8f0d0` at 03:04:29 UTC, read from the commit timestamps — and **both
+describe defects that are still live for users**. Neither is a report about a page nobody can open: the surfaces are
+deployed and reachable, and one of them silently destroys something the sender
+wrote.
+
+**The deployment has not moved, and this card measured that rather than assumed
+it.** At **2026-09-01 05:20:32 UTC** the served root still loads
+`/assets/index-CnoFAC2c.js` — the same chunk fingerprint
+[`STAGE.md` §2.2](https://github.com/pumasi-ai/pumasi-sign/blob/main/roadmap/STAGE.md)
+used to identify the deployed tree as
+[`0e26917`](https://github.com/pumasi-ai/pumasi-sign/commit/0e26917) — and
+`service/wrangler.jsonc` binds `../frontend/dist` as the worker's own `ASSETS`
+directory, so the two ship as one artefact and an unmoved front end is an
+unmoved worker. `GET /api/health` answered `200` at **05:20:33 UTC**, naming
+itself `pumasi-sign`. The product is
+up, running the old code.
+
+**Re-measured by a second seat at 2026-09-01 05:50:00 UTC, before this page was
+published, so none of it rests on an earlier seat's word.** The served root still
+loads `/assets/index-CnoFAC2c.js`; `/api/health` still answers `200`; and each
+chunk this section reads out is still the byte-for-byte artefact named below —
+`ExternalSignView-CmDSqiPb.js` **5 250** bytes, `SignView-BM1dkPaZ.js` **46 980**,
+`LandingView-C5khdw3s.js` **10 046**. The deployment has not moved.
+
+### 1 · The settings pencil deletes the message you wrote to your signers
+
+**What a sender loses.** The send form gives you a box for a covering note to
+the people signing — *Please sign by Friday.*, *This replaces the draft I sent
+Tuesday.* — and `durable.ts` returns it to every recipient on the token view, so
+it is often the only explanation they get for what they are being asked to sign.
+Elsewhere on the same screen there is a pencil for the expiration date and the
+reminder settings. **Opening it, changing nothing, and pressing save deletes the
+note.** The dialog then reports *Envelope settings updated.* — that string is in
+the served chunk, beside the request that causes the loss — and closes. Nothing
+warns, nothing asks, and nothing on the screen afterwards says the note is gone.
+
+**Both halves measured on the live host, 2026-09-01 05:22:14 UTC.** The client half
+is in the chunk a sender's browser actually runs — and it is worth seeing the
+two dialogs side by side, because they call the same route:
+
+```console
+$ curl -s https://sign.pumasi.ai/assets/EnvelopeDetailView-C4VlFBtA.js \
+    | grep -o 'patch(`/submissions/\${e}`,{[^}]*}'
+patch(`/submissions/${e}`,{title:t,message:n||null}
+patch(`/submissions/${e}`,{expires_at:t,reminders_enabled:U.value,reminder_interval_days:dt.value}
+```
+
+The first is the *correct details* dialog, which is about the message. The
+second is the settings pencil, which is not — three fields, no `message`. The
+server half is the deployed commit's own source, read at `0e26917` rather than
+at `main`:
+
+```js
+// service/src/durable.ts:1209-1211 at 0e26917 — the tree serving sign.pumasi.ai
+`UPDATE submissions SET title = ?, message = ?, updated_at = ? WHERE id = ?`,
+String(body.title ?? sub.title).slice(0, 200),
+body.message != null ? String(body.message).slice(0, 2000) : null,
+```
+
+The title has a rule for the absent case. **The message has none**, so a request
+that never mentions it is treated as a request to erase it.
+
+**Merged, and not deployed.**
+[`9659e69`](https://github.com/pumasi-ai/pumasi-sign/commit/9659e69) is in
+`main` and tells *absent* (keep) from *present-and-null* (clear) — `durable.ts`
+now reads `body.message !== undefined ? … : (sub.message ?? null)` at line 1326.
+**This page does not claim that repair has shipped**, and neither does its own
+note:
+[*Pumasi Sign stops deleting the message you wrote to your signers*](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-09-01-pumasi-sign-message-survives-settings.md),
+a can-hurt release whose 7-day veto window closes **2026-09-08**.
+**That date is [`DECISIONS.md` **Q-037**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)'s
+own, reported here and not set here** — this card sets no deadline on any
+steward entry and has no standing to.
+
+**One thing the repair cannot do, and it is why this belongs on the card rather
+than in a changelog: messages already deleted are gone.** That is the release
+note's own statement, in the sender's words, and the deployed tree corroborates
+it as far as a reading of the tree can: the `UPDATE` above overwrites the column
+in place, and the `corrected` audit row written immediately after it
+(`durable.ts:1214` at `0e26917`) is called with no `details_json` at all, so no
+prior value is recorded anywhere the service can read back. What backups a
+particular Cloudflare account keeps is not something this page can measure, and
+it does not claim to.
+
+### 2 · An expiration date on the live service does nothing
+
+The send wizard asks for a deadline, refuses one in the past, shows it back, and
+states in two places — `SendView.vue:1332` and `EnvelopeDetailView.vue:1104`
+— that *without* an expiration date the envelope stays open until completed or
+voided. (The refusal is `:min="todayIso"` on that field, `SendView.vue:1300`.) The plain reading is that *with* one it does not. On the deployed build
+the date is **stored and otherwise ignored**, and the two routes differ in a way
+worth separating rather than blurring: the send form's `INSERT INTO submissions`
+(`durable.ts:1062` at `0e26917`) does write `expires_at`, while the settings
+pencil's `PATCH` never touches it. So the date you set at send time is kept and
+never acted on, and the date you set afterwards is not even kept. Nothing ever
+expires either way.
+
+**Measured 2026-09-01 05:22:14 UTC, on the deployed tree and on the chunks a
+recipient's browser actually loads.** At `0e26917`, `service/wrangler.jsonc` has
+**no `crons` key**, `service/src/worker.ts` has **no `scheduled` export**, and
+the `PATCH` route the pencil calls contains **no `expires_at` write**. Nothing
+sweeps; no envelope ever reaches the `expired` status. That shows through to the front end: the served
+`ExternalSignView-CmDSqiPb.js` (`200`, 5 250 bytes), which is what an emailed
+signing link opens, carries **four** closed-envelope cases and no expired one —
+*already signed*, *complete*, *voided*, *declined* — so a past-due envelope
+still reports `open`, still shows its landing page, and still mails the signer a
+verification code — `6-digit`, which is that same chunk's own word for it, three
+times.
+
+**Where it does stop, and why that is the point rather than a mitigation.**
+After the code, the shared signing view refuses: the served
+`SignView-BM1dkPaZ.js` (`200`, 46 980 bytes) computes
+`r=n!=null&&new Date(n).getTime()<=Date.now()` from `expires_at` and blocks with
+*This envelope reached its expiration date and can no longer be signed.* **That
+check is client-side only**, and the deployed source's own comment beside it
+(`SignView.vue:480` at `0e26917`) says *the server rejects `/complete` the same
+way* — which at that commit it does not. So the deadline is enforced against
+the party using the app and not against the party addressing the API directly.
+This card does not tell you a past-due envelope is unsignable on the live
+service; it tells you the service is not what stops it.
+
+**Merged, and not deployed.**
+[`2471a29`](https://github.com/pumasi-ai/pumasi-sign/commit/2471a29) adds the
+hourly cron trigger and the `scheduled` sweep, joins `expired` to `isTerminal()`
+so the guards already in the code refuse it, and starts saving what the pencil
+sends.
+[*Pumasi Sign now keeps the expiration date it asks you for*](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-09-01-pumasi-sign-expiration-dates-bind.md)
+carries a 7-day window closing **2026-09-08** — again
+[`DECISIONS.md` **Q-035**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)'s
+own date, reported — and its own second paragraph reads *It is merged and it is
+**not deployed**.*
+
+### Why both are still here, and what this page will not do about it
+
+**Nobody owns deployment.** That is
+[`DECISIONS.md` **Q-012**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
+open — and explicitly **outside** CHARTER Part 0's proceed-on-default rule, so
+unlike nearly everything else in this project an agent may not proceed on it.
+**It is not this product's problem alone**: as of 2026-09-01 the same entry also
+holds the repair for a `booking.pumasi.ai` page that shows a booker no times at
+all, measured on that host and written up on the
+[Pumasi Booking](/products/pumasi-booking/) card. One open question, two
+products, and a user meeting a defect on each.
+**Q-028** counted the repairs already stacked in the undeployed bundle at
+`0e26917`, and **each of these two entries places itself in that queue in its own
+words** rather than leaving this card to do the arithmetic. Q-035: *"Q-028
+records that two earlier repairs already wait in the same undeployed bundle;
+this is the third."* Q-037: *"Q-028 counted three repairs already waiting in that
+undeployed bundle and this is the fourth."* So the expiration repair is the
+**third** and the message repair the **fourth**. **This card sets no deadline
+on any of those entries, names no deployer, and takes no position on their
+defaults.** It reports their state, which is all a catalog page is for.
+
+**The ordering is the part that generalises.** The expiration repair is what
+makes that pencil start working — which would have driven *more* senders into
+it, and every use of it still wiping the message. The two repairs were published
+eighty-three minutes apart, land in the same bundle, and wait together behind one
+open question about who carries a merge to a user — an entry raised well before
+either of them.
 
 ## Run it
 
@@ -242,10 +420,10 @@ lying until recently and this page said so.** Through 2026-08-31,
 `gh repo view --json licenseInfo` returned `null` for *every* repository in
 this organisation, including `pumasi-tunnel` and `pumasi-web`, which
 demonstrably do carry an Apache-2.0 `LICENSE` — so a `null` there was not
-evidence of absence, it was no evidence at all. **Re-checked on 2026-09-01,
-that is no longer true**: GitHub's detection has caught up and now reports
-`{"key":"apache-2.0"}` for both of those repositories, and `null` for
-`pumasi-sign`.
+evidence of absence, it was no evidence at all. **Re-checked by this card at
+2026-09-01 05:26:39 UTC, that is no longer true**: GitHub's detection has caught
+up and now reports `{"key":"apache-2.0"}` for both of those repositories, and
+`null` for `pumasi-sign`.
 
 The conclusion is unchanged and the reasoning is worth keeping anyway. That
 `null` is the evidence cited in `pumasi-sign`'s own `STAGE.md` §2.3 and in
@@ -254,7 +432,7 @@ correctly licensed repository — a test that cannot fail is not a check.
 It happens to be corroborated now, which is luck rather than method. **The
 question the file answers is still the one to ask**: `gh api
 repos/pumasi-ai/pumasi-sign/contents/LICENSE` → `404`, above, re-run for this
-card on 2026-09-01.
+card at 2026-09-01 05:22:52 UTC.
 
 **Which of those it is, is not this page's call.** It is open as
 [`pumasi/DECISIONS.md`](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)
@@ -328,12 +506,16 @@ in any queue and matches no release note; it had to be identified from the
 artefact, which `STAGE.md` §2.2 does by chunk fingerprint, landing on
 [`0e26917`](https://github.com/pumasi-ai/pumasi-sign/commit/0e26917) — built
 from a working tree five seconds *before* that commit's own timestamp. **And
-`main` has already moved past it again**, including
-[`2471a29`](https://github.com/pumasi-ai/pumasi-sign/commit/2471a29), which
-changes `service/src/worker.ts`, `service/src/durable.ts` and
-`service/wrangler.jsonc`. So the repository is ahead of the deployment once
-more, and nothing carries one to the other. **Someone deployed; the question of
-who owes you the next one is still open.**
+`main` has moved past it by nine commits since** — `git rev-list --count
+0e26917..f0d1912` against a freshly fetched `origin/main`, run by this card on
+2026-09-01 — of which **two change `service/src/durable.ts`**, the file that
+answers this host:
+[`2471a29`](https://github.com/pumasi-ai/pumasi-sign/commit/2471a29) and
+[`9659e69`](https://github.com/pumasi-ai/pumasi-sign/commit/9659e69). Those are the two repairs the section *Two defects are
+live on the hosted service* measures, and the reason this paragraph is not a
+piece of housekeeping: the repository is ahead of the deployment by two defects
+a user is meeting today, and nothing carries one tree to the other. **Someone
+deployed once; the question of who owes you the next one is still open.**
 
 The sign-in repair is written up in
 [a release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-sign-sign-in-again.md)
@@ -352,8 +534,10 @@ and **this page quotes no rank from it.** That file was reordered three times on
 2026-08-31 alone; a rank in prose is the same kind of cache as a test count, and
 the one this page used to publish was spent before you read it. Read the file.
 See *Before you use it* at the top of this page for what is still worth knowing
-before you rely on this — it is now the licence, not the front door. The local
-`wrangler dev` route above is unaffected by any of it.
+before you rely on this — **as of 2026-09-01 that is two live defects in the
+deployed worker and the licence claim, no longer the front door.** The local
+`wrangler dev` route above is unaffected by any of it, and neither defect is in
+the `main` you would clone.
 
 ### 1. Document Dashboard & Action Queue
 Manage incoming signature requests, active contracts, and completed envelopes in one centralized view:
