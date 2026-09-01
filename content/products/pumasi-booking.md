@@ -4,9 +4,9 @@ description: "A booking page people can send someone to pick a time on. Accounts
 compareTo: [Calendly, "Cal.com"]
 status: beta
 repo: "https://github.com/pumasi-ai/pumasi-booking"
-limitation: "two reviewed fixes for live defects are merged but not deployed — booking.pumasi.ai is still serving the build from 2026-08-30 16:55 UTC, so a connected owner's Zoom personal meeting room is still printed on their public booking page, and no reminder, follow-up or webhook has ever been delivered on that deployment. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
+limitation: "nobody has yet measured a reminder, follow-up or webhook actually being delivered on booking.pumasi.ai. The repaired timer deployed 2026-09-01 00:40:44 UTC, so the code is on the worker — but delivery is unverified, and an organisation that has booked nothing since then may have no alarm armed at all. When a queue does drain, work overdue since 2026-08-28 is sent late rather than skipped. The repository is still ahead of the deployment and nothing carries one to the other. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
 order: 1
-updated: 2026-08-31
+updated: 2026-09-01
 ---
 
 ## Run it
@@ -53,34 +53,54 @@ the limit is stated in the product's own
 under claim C1). Self-host with your own credentials and the gate does not
 apply to you. This is one of the reasons the product is not `launched`.
 
-## Conferencing links, reminders, and two defects that are live right now
+## Conferencing links, reminders, and two defects that were live until 00:40 UTC
 
-If you press "Connect with Zoom" on the deployment today, your Zoom **personal
-meeting room** — the one permanent room an account has — is pasted onto your
-public booking page, where anyone who opens that page can read it and walk in.
-They do not have to book, prove an email address, or be invited. The same paste
-also suppressed the per-booking room the card beside the button promised.
+Until 2026-09-01, pressing "Connect with Zoom" on the deployment pasted your
+Zoom **personal meeting room** — the one permanent room an account has — onto
+your public booking page, where anyone who opened that page could read it and
+walk in. They did not have to book, prove an email address, or be invited. The
+same paste also suppressed the per-booking room the card beside the button
+promised.
 
-**The fix is merged, reviewed and gate-passed — and it is not deployed: the
-build serving `booking.pumasi.ai` today is the one without it.** The repository
-and the deployment are two different things here, and this page says which is
-which rather than letting the repository take credit for the product:
+**That is no longer the build you get, and this page stops saying it is on the
+day it stopped being true.** `booking.pumasi.ai` was deployed three times
+between **2026-09-01 00:38:41 and 00:40:44 UTC** — the deployment before them
+was 2026-08-30 16:55:37 UTC — and the commit that removes the paste is an
+ancestor of what the worker now serves. Both halves are checkable without
+credentials to this account: `curl https://booking.pumasi.ai/version` names the
+build, and `git merge-base --is-ancestor` answers whether a given fix is in it.
+Re-measured 2026-09-01 01:47 UTC.
+
+**The repository and the deployment are still two different things, and this
+page still says which is which** — the gap shrank, it did not close:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
-| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-08-30 16:55:37 UTC**, re-measured with `npx wrangler deployments list` on 2026-08-31 at 22:04 UTC |
-| Personal meeting room on the public page | removed | **still printed — the leak is live** |
-| Per-booking room, created at booking time | yes | no |
-| Reminders, follow-ups and webhooks | sent when due | **never sent — not one, since the feature shipped 2026-08-28** |
-| Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | n/a — this build predates the fix |
+| Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-09-01 00:40:44 UTC**, re-measured with `npx wrangler deployments list` on 2026-09-01 at 01:47 UTC; `/version` names the build it is serving |
+| Personal meeting room on the public page | removed | **removed** — the fix is an ancestor of the deployed build |
+| Per-booking room, created at booking time | yes | yes |
+| Reminders, follow-ups and webhooks | drained by a timer, with a test that executes the deployed entry point's alarm handler | **the repaired timer is deployed; no delivery has been measured** — read the section below before you rely on it |
+| Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | every reviewed fix described on this page is an ancestor of the deployed build. No count is given here, because the check is the citation |
+| Merged after that deploy, and not in it | a button on the event settings page that opens your own public booking page | not there |
 
-Nothing carried the reviewed build to the worker, and that gap is structural
-rather than an oversight: the charter's flow ends at a published release note,
-and no role owns deployment. It is open as
+**Do not read that last row as nearly-shipped.** The commit was authored
+**seven seconds** after the deployment that would have carried it — deploy at
+00:40:44 UTC, commit at 00:40:51 UTC. Seven seconds and a deploy is exactly as
+undeployed as thirty-one hours and a deploy, which is the whole reason this
+table has two columns and why it keeps them now that it has only one row to
+put in the gap.
+
+**The deploy that closed the two defects did not travel the charter's flow
+either, and that is the part that has not changed.** All three deployments are
+attributed to the operator account with `Source: Unknown (deployment)` in
+`npx wrangler deployments list`, and no release note records them. The flow ends
+at a published release note, and no role owns deployment. It is open as
 [`DECISIONS.md` Q-012](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
-and the deploy sits at the top of
+and the deploy still sits at the top of
 [`BACKLOG.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/roadmap/BACKLOG.md)
-as item 1, marked operator action rather than a build.
+as item 1, marked operator action rather than a build. **Someone deployed; the
+question of who owes you the next one is still open**, and the row above is what
+waiting looks like while it is.
 
 What changed in `main` is written up in full — including what was deliberately
 *not* changed, and what could still hurt someone — in
@@ -88,20 +108,24 @@ What changed in `main` is written up in full — including what was deliberately
 (a can-hurt release under the charter; the charter's seven-day veto window
 runs to 2026-09-07, which the steward has yet to confirm —
 [Q-011](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)). That note
-is written in the present tense and describes the branch. **Until the deploy
-happens, read every sentence in it as true of the repository and not of the
-page you can open.**
+is written in the present tense and describes the branch. It now happens to
+describe the page you can open as well — **which is a coincidence of dates and
+not a property of release notes.** Read one as a claim about the repository and
+check the deployment separately; that is the habit this table exists to enforce,
+and today's agreement between the two columns is not a promise about the next
+note you read.
 
 If you have connected Zoom to the hosted deployment, pressing **Disconnect**
-removes the stored link now, without waiting for the deploy.
+removes the stored link.
 
-**Further reviewed fixes have merged since, and none of them changes anything
-you can use today.** This page keeps no running count of them — a tally is a
-cache that goes stale on the next merge, and the one that used to sit here
-already had. The standing fact is the one that does not move: every merged fix
-below waits on the same open Q-012, and
+**Further reviewed fixes merged after that note, and the 00:40 UTC deploy
+carried every one of them.** This page still keeps no running count — a tally is
+a cache that goes stale on the next merge, and the one that used to sit here
+already had. The standing facts are the ones that do not move:
 [`pumasi/releases/`](https://github.com/pumasi-ai/pumasi/tree/main/releases) is
-the current list rather than this paragraph.
+the current list rather than this paragraph, and `git merge-base --is-ancestor`
+against the commit `/version` reports is how you tell whether any one of them
+has reached you.
 
 **The OAuth callback.** It now gates on being able to open a *signed* state
 value rather than on a calendar integration existing, so a deployment that has
@@ -133,27 +157,29 @@ is a can-hurt note under
 [Q-022 and Q-023](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
 veto window to 2026-09-07.
 
-**What both have in common, and it is the same two things each time.** They are
-**merged and not deployed**, for the same Q-012 reason as the row above, so the
-right-hand column of that table is unchanged by either. And **neither defect can
-occur on `booking.pumasi.ai` at all** — that deployment has Google Calendar
+**What both have in common, and only one of the two things has changed.** They
+are now **deployed** — each is an ancestor of the build `/version` reports — so
+the right-hand column of that table no longer separates them from the left. What
+has not changed is the half that mattered more: **neither defect could occur on
+`booking.pumasi.ai` at all**, because that deployment has Google Calendar
 configured, which is precisely the condition that hid both bugs. The people they
 were broken for are self-hosters, and companies running their own copy from the
-repository; for them merged genuinely is the delivery mechanism, once they pull.
+repository; for them merged genuinely is the delivery mechanism, once they pull,
+and the deploy above changed nothing for them either way.
 
-**Neither of them touches the Zoom leak above, which is still live.** Nothing in
-either release goes near it, and nothing has been deployed since:
-`npx wrangler deployments list` still puts the last deployment of this worker at
-**2026-08-30 16:55:37 UTC** — re-measured 2026-08-31 at 22:04 UTC, and it had not
-moved — and `booking.pumasi.ai` answers that build today.
+**Neither of them touches the Zoom leak above, which a different commit closed.**
+Nothing in either release goes near it. What ended that leak was the deploy, and
+the ancestry check in the table is the evidence for it rather than either of
+these two notes.
 
-### The second defect: reminders, follow-ups and webhooks have never been sent on the hosted deployment
+### The second defect: reminders, follow-ups and webhooks were never sent for three days, and the repair is now deployed
 
 Pumasi Booking sells timed messages — a reminder the day before, a follow-up
 afterwards — and webhooks that tell another system when someone books, cancels
-or reschedules. **On `booking.pumasi.ai`, none of them has ever been
-delivered.** Not one reminder, not one follow-up, not one webhook, since the
-feature shipped on 2026-08-28.
+or reschedules. **On `booking.pumasi.ai`, between the feature shipping on
+2026-08-28 and the deploy at 2026-09-01 00:40 UTC, not one of them was
+delivered.** Not one reminder, not one follow-up, not one webhook, for three
+days.
 
 They were not delayed, and no mail provider dropped them. **They were never
 attempted.** Everything timed goes onto a queue and a timer drains it; on the
@@ -174,13 +200,43 @@ the tool that bundles it strips types without reading them, so a missing import
 bundled cleanly and shipped. For this defect, self-hosting is what protected
 you.
 
-**The fix is merged and it is not deployed**, on the same open Q-012 as
-everything else on this page, and the deployment measurement above is the whole
-answer: nothing has moved, so your reminders and webhooks are still not being
-sent. When someone does deploy, anything still queued for a future time is
-delivered normally; nothing whose moment has already passed is sent late, which
-is deliberate — a follow-up for a meeting three days ago would be noise rather
-than service.
+**The fix is deployed, and that is a smaller claim than it sounds.** The commit
+that adds the missing import is an ancestor of the build `/version` reports, so
+the code that drains the queue is on the hosted worker. **Nobody has measured a
+reminder actually arriving since.** This page will not tell you your reminders
+are working on the strength of a deployment: those are two different facts and
+only the first has been checked. Checking the second means booking against a
+real owner's page — the same line the evaluation described below declined to
+cross, for the same reason.
+
+**What the source says recovery depends on, so you can reason about your own
+queue instead of waiting for a reassurance.** Each organisation is one Durable
+Object holding one alarm. The repaired handler drains what is due and then arms
+the next alarm from the earliest job still pending — the line the old crash died
+just before reaching. Enqueuing work arms it too, by the same rule. So the
+deploy replaced the code; **it did not by itself put an alarm back on a clock
+that has had none since 2026-08-28.** If nothing has been booked, cancelled or
+rescheduled in your organisation since the deploy, then nothing on this page
+establishes that your queue has moved. Do one of those things and it does.
+
+**And when a queue does drain, overdue work is sent — not skipped.** This page
+said the opposite until today, inheriting it from
+[the release note](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-08-31-pumasi-booking-alarm-import.md),
+which states that *"Reminders whose moment has passed are not sent late; a
+follow-up for a meeting three days ago would be noise, not service."* The code
+does not do that. The drain selects every pending job whose run time is at
+or before now — twenty to a pass, oldest first — sends it and marks it done
+([`service/src/automation.ts`](https://github.com/pumasi-ai/pumasi-booking/blob/main/service/src/automation.ts),
+`processDueJobs`); nothing purges a stale job, and cancelling a booking removes
+only its *future* ones. The product does refuse late work in exactly one place,
+and it is a different place: at **booking** time, a before-or-after reminder
+whose moment has already gone is never queued at all. That guard is real and it
+is in the same file, fifty lines above the drain — but it decides what enters
+the queue, never what leaves it, so it cannot do anything about a job that was
+queued on time and then sat there for three days. **So expect backdated reminders and webhooks on the first drain
+after the deploy, and read them as the cost of a three-day outage rather than as
+a second defect.** Correcting the release note is not this page's to do. Saying
+the true thing here is.
 
 **How it was found, and what is not being claimed.** Nobody reported this. The
 issue tracker holds nothing about it, and that is the shape of the failure
