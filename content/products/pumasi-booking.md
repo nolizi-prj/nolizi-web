@@ -4,7 +4,7 @@ description: "A booking page people can send someone to pick a time on. Accounts
 compareTo: [Calendly, "Cal.com"]
 status: beta
 repo: "https://github.com/pumasi-ai/pumasi-booking"
-limitation: "nobody has yet measured a reminder, follow-up or webhook actually being delivered on booking.pumasi.ai. The repaired timer deployed 2026-09-01 00:40:44 UTC, so the code is on the worker — but delivery is unverified, and an organisation that has booked nothing since then may have no alarm armed at all. When a queue does drain, work overdue since 2026-08-28 is sent late rather than skipped. The repository is still ahead of the deployment and nothing carries one to the other. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
+limitation: "**the public booking page on `booking.pumasi.ai` shows no times to book, and a stranger meets that before anything else on this card.** Measured first-hand 2026-09-01: `GET https://booking.pumasi.ai/yunyoungmok/abc` answered `200`, 45 407 bytes, at **05:21:07 UTC**, carrying **24** slots in its own `#slots-data` — and the `render()` in those very bytes builds a button for each one and appends none. `times` is cleared (`times.textContent=''`) and queried (`times.querySelectorAll`) and never appended to; the five `appendChild` calls on that page all belong to other elements. Driven in headless Chrome at **05:21:26 UTC** in `America/Chicago`: day cells `1` and `2` render as available, the heading reads *Tuesday, September 1*, `#times.children.length` is **0**, and **nothing is thrown** — zero `pageerror`, zero console errors. So a day the calendar offers is a day with an empty list under it, silently, and a booking page that cannot show a time cannot take a booking. It was [filed from the live product](https://github.com/pumasi-ai/pumasi-booking/issues/32) at 2026-09-01 00:36:56 UTC, repaired at [`d7bd490`](https://github.com/pumasi-ai/pumasi-booking/commit/d7bd490), and **not deployed**: `/version` answered `{"version":"0.2.0","commit":"2453adc"}` at 05:20:31 UTC and the repair is not in that build. That is `pumasi/DECISIONS.md` **Q-038**, whose own row records a window closing 2026-09-08. Separately, nobody has yet measured a reminder, follow-up or webhook actually being delivered on booking.pumasi.ai. The repaired timer deployed 2026-09-01 00:40:44 UTC, so the code is on the worker — but delivery is unverified, and an organisation that has booked nothing since then may have no alarm armed at all. When a queue does drain, work overdue since 2026-08-28 is sent late rather than skipped. The repository is still ahead of the deployment and nothing carries one to the other. **And the subprocessor register that host serves is short by one party.** Re-measured by this card 2026-09-01 05:20:31 UTC: `/version` answers `2453adc`, `/subprocessors` (`200`, 34 663 bytes) names five parties and no sixth, and that build sends **Zoom** the booker's name and email address on any booking for an event type whose location is Zoom (`service/src/app.ts:3524` and `:3528` at `2453adc`). `main` names *Zoom Video Communications, Inc.* since `c000feb`; the deployment does not, and nothing carries the correction across — `pumasi/DECISIONS.md` **Q-012** and **Q-036**, both open, and neither this page's to answer. Beware the obvious check: `grep -ic zoom` on that page returns **4**, and all four are page presentation — three the `pf-shot-zoom-hint` class (two stylesheet rules and one `class=` on a screenshot caption) and one `style="cursor:zoom-in;"` on a preview image; `grep -io "zoom video"` is the test, and at 05:20:31 UTC it returned nothing. Separately, no lawyer has reviewed its privacy pack, and no standard contractual clauses cover its US transfer position — the legal pages it serves say so on their face."
 order: 1
 updated: 2026-09-01
 ---
@@ -28,6 +28,111 @@ restart until you give it a `DATABASE_URL`.
 The invite appears **only while there are no accounts**. Once anyone has signed
 up it stops, even if asked for explicitly: an invite that keeps appearing is a
 back door. After that they are minted deliberately, from the CLI.
+
+## The hosted booking page shows no times, and the repair is merged and not deployed
+
+**If you are about to send someone to a booking page on `booking.pumasi.ai`,
+read this first: they will see nothing to click.** A day the calendar renders
+as available opens to a heading naming that day and an empty space where the
+times go. This is not one page's bad luck — `bookingPage()` in
+`service/src/pages.ts` is the single renderer behind every public booking page
+that build serves, and the defect is in it. Nothing errors, nothing warns, and neither the person
+booking nor the person who published the link is told why. A booking page that
+cannot show a time cannot take a booking, so on the other side of that page
+nothing happens at all — no meeting, no confirmation, no reminder.
+
+**Measured by this card against the live host on 2026-09-01, not against
+source.** Two independent measurements, because the second is what a person
+actually experiences and the first is what anyone can check without a browser:
+
+```console
+$ date -u +"%Y-%m-%d %H:%M:%S UTC"
+2026-09-01 05:21:07 UTC
+
+$ curl -s -o /tmp/bp.html -w "%{http_code} %{size_download}\n" \
+    https://booking.pumasi.ai/yunyoungmok/abc
+200 45407
+
+$ grep -o 'times\.[a-zA-Z]*' /tmp/bp.html | sort | uniq -c
+      1 times.querySelectorAll
+      1 times.textContent
+```
+
+Twenty-four slots arrive in the page's own `#slots-data`, correct and
+complete. The `render()` shipped in the same bytes walks them, builds a
+`<button class="slot">` for each, wires its click handler — and then lets it
+fall out of scope. `times` is only ever *cleared* and *queried*. It is never
+appended to. The five `appendChild` calls elsewhere on the page belong to other
+elements entirely.
+
+**Driven in a real browser, because a defect in what a string *does* is not
+visible in the string.** Headless Chrome, timezone `America/Chicago`, against
+the live host at **2026-09-01 05:21:26 UTC**:
+
+| | |
+|---|---|
+| HTTP status | `200` |
+| slots in `#slots-data` | **24** |
+| day cells marked available | `1`, `2` |
+| `#picked-day` | *Tuesday, September 1* |
+| **`#times.children.length`** | **0** |
+| `#times.innerHTML` | *(empty string)* |
+| page errors + console errors | **0** |
+
+The last row is the reason this ran for four weeks. **Nothing goes wrong in any
+sense a computer can detect** — the page does exactly what it was told, and what
+it was told was incomplete. The report that surfaced it says *0 error(s)
+captured*, and that was accurate.
+
+**Re-driven half an hour later, by a second seat, before this page was
+published.** At **2026-09-01 05:49:38 UTC** the same browser run against the same
+live host returned the same page — `200`, 45 407 bytes, **24** slots, day cells
+`1` and `2` — and this time *both* available days were clicked rather than one:
+`#times.children.length` is **0** under *Tuesday, September 1* **and** **0**
+under *Wednesday, September 2*, with **0** errors captured. `/version` still
+answered `2453adc` at 05:48:45 UTC. Nothing above is carried on an earlier
+seat's word.
+
+**One deleted line, in a commit about something else.** `50f911f` removed
+`times.appendChild(b)` from the `byDay[pickedDay].forEach` loop in
+`service/src/pages.ts` while inserting a `localStorage` block that remembers a
+booker's name and email between visits — a change with no business touching the
+calendar. Read out of the deployed commit rather than out of `main`:
+`git show 2453adc:service/src/pages.ts` puts the `forEach` at `:974` and closes it
+at `:985` with the button built, wired, and never placed. `:985` is the line the
+repair puts it back on.
+
+**The repair is merged and it is not deployed.**
+[`d7bd490`](https://github.com/pumasi-ai/pumasi-booking/commit/d7bd490) adds the
+line back with a comment saying why it must not be removed again, and adds
+`service/test/booking-slots.test.ts`, which serves that tree's own page over
+loopback and drives it in a browser — **2 of 6 before the fix and 6 of 6
+after**, where 331 existing service assertions read the page as a string and all
+passed on both sides. **This page does not claim that repair has shipped.**
+`curl https://booking.pumasi.ai/version` answered
+`{"version":"0.2.0","commit":"2453adc"}` at **05:20:31 UTC** on 2026-09-01, and
+the repair is not in that build — which is why the two measurements above, taken
+a minute later, still show an empty list.
+
+**Why it is still here.** Nobody owns deployment. That is
+[`DECISIONS.md` **Q-012**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
+open, and explicitly **outside** CHARTER Part 0's proceed-on-default rule, so
+unlike nearly everything else in this project an agent may not proceed on it.
+The release note is
+[*A booking page day that shows times, shows times*](https://github.com/pumasi-ai/pumasi/blob/main/releases/2026-09-01-pumasi-booking-a-day-that-shows-times-shows-times.md),
+and its own second paragraph reads *It is merged and it is **not deployed***.
+The entry is **Q-038**, whose own row records a window closing **2026-09-08** —
+that is the entry's date, reported here and not set here. **This card sets no
+deadline, names no deployer, and takes no position on any default.**
+
+**What the repair cannot do, named rather than smoothed over.** Bookings that
+did not happen in the four weeks this was live are not recoverable, and nobody
+knows how many there were. The release note says so rather than letting *fixed*
+imply otherwise, and so does this card.
+
+**The local route above is unaffected.** `npm run build` from a fresh clone of
+`main` gives you a booking page that shows its times. The defect is in the
+deployment, not in the repository you would clone.
 
 ## It can see your real calendar, once you connect one
 
@@ -72,16 +177,19 @@ build, and `git merge-base --is-ancestor` answers whether a given fix is in it.
 Re-measured 2026-09-01 01:47 UTC.
 
 **The repository and the deployment are still two different things, and this
-page still says which is which** — the gap shrank, it did not close:
+page still says which is which** — the gap shrank on 2026-09-01 00:40 UTC and
+has since widened again by eight commits, two of which a user is meeting today:
 
 | | `main`, the repository | `booking.pumasi.ai`, what you can use today |
 |---|---|---|
 | Build | [whatever `main` is when you read this](https://github.com/pumasi-ai/pumasi-booking/commits/main) — no commit is copied here, because a commit copied into prose goes stale on the next merge and this one already had, twice | last deployed **2026-09-01 00:40:44 UTC**, re-measured with `npx wrangler deployments list` on 2026-09-01 at 01:47 UTC; `/version` names the build it is serving |
+| **Times on a public booking page** | shown | **not shown — the list is empty on every available day.** `d7bd490` is not an ancestor of `2453adc`; measured on the host 2026-09-01 05:21, first section on this page |
 | Personal meeting room on the public page | removed | **removed** — the fix is an ancestor of the deployed build |
 | Per-booking room, created at booking time | yes | yes |
 | Reminders, follow-ups and webhooks | drained by a timer, with a test that executes the deployed entry point's alarm handler | **the repaired timer is deployed; no delivery has been measured** — read the section below before you rely on it |
-| Reviewed and gate-passed | Gemini spec + code review, `GATE: PASS` | every reviewed fix described on this page is an ancestor of the deployed build. No count is given here, because the check is the citation |
-| Merged after that deploy, and not in it | a button on the event settings page that opens your own public booking page | not there |
+| Subprocessor register at `/subprocessors` | `service/src/legal.ts` names *Zoom Video Communications, Inc.* since `c000feb` | **names five parties and not Zoom, and the build sends Zoom the booker's name and email** — measured 2026-09-01 05:20:31, section *Where it stands legally* |
+| Reviewed and gate-passed | each fix named on this page carries at least one approving review from a family other than its builder's, and `GATE: PASS` | **the two live defects above are reviewed, gate-passed, merged, and not in this build.** Review is not delivery, and no count is given here because the check is the citation: `git merge-base --is-ancestor <fix> 2453adc` |
+| Merged after that deploy, and not in it | **eight commits** at 05:49 UTC on 2026-09-01 — `git rev-list --count 2453adc..origin/main` against a freshly fetched remote. It read **seven** half an hour earlier, at 05:21; run the command rather than trusting the number, because that repository has a writer in it today — including the empty-times repair (`d7bd490`), the subprocessor-register repair (`c000feb`), and a button on the event settings page that opens your own public booking page | none of them |
 
 **Do not read that last row as nearly-shipped.** The commit was authored
 **seven seconds** after the deployment that would have carried it — deploy at
@@ -330,8 +438,80 @@ request to `admin@pumasi.ai`, reaching backups within 30 days), which closed hal
 of [`DEBT.md` D-107](https://github.com/pumasi-ai/pumasi/blob/main/governance/DEBT.md);
 that entry stays open until the intake exists with its deletion path implemented
 and tested. D-108, which recorded the absence of any mechanism, closed
-2026-08-30. Mail and calendar connections are a separate matter, and every third
-party that can see data is named in the subprocessor register.
+2026-08-30. Mail and calendar connections are a separate matter, and the register
+that names the third parties who can see data **names Zoom in `main` and is
+short by that party on the deployment you can actually read** — the next section
+measures both.
+
+### The subprocessor register is right in the repository and wrong on the host
+
+**Re-measured by this card against the live host on 2026-09-01 at 05:20:31 UTC,
+not against source, and taken at this seat's own clock rather than carried from
+an earlier one.** `curl https://booking.pumasi.ai/version` answers
+`{"version":"0.2.0","commit":"2453adc"}`, and `GET /subprocessors` on that host
+answers `200`, 34 663 bytes, naming **five** parties and no sixth: *Cloudflare,
+Inc.*, *Google LLC (Gmail API)*, *Google LLC (Google Calendar)*, *Microsoft
+Corporation (Microsoft Graph)* and *date.nager.at*.
+
+**The build serving that page sends a sixth party the booker's name and email
+address.** Read out of the deployed commit itself rather than out of `main` —
+`git show 2453adc:service/src/app.ts` — a booking on an event type whose
+`location_kind` is `zoom` mints a Zoom meeting with these two fields:
+
+```js
+// service/src/app.ts at 2453adc — the commit booking.pumasi.ai reports serving
+topic:  `${schedule.title} — ${name}`,                      // :3524 — the booker's name
+agenda: `Booked by ${name} <${email}> via Pumasi Booking`,  // :3528 — name and address
+```
+
+That call is made on **either** of two credentials, and the difference matters
+enough to have been read out of the same commit rather than taken on trust.
+Step 2 (`app.ts:3533-3545`) uses the account holder's **own** stored Zoom grant.
+Step 3 (`app.ts:3549-3557`) runs *only when step 2 produced no meeting* and uses
+`config.zoomAccountId` / `zoomClientId` / `zoomClientSecret` — a
+**server-to-server credential belonging to whoever runs the deployment**, on the
+*operator's* authorisation. So a booking can reach Zoom for an account holder
+who never connected anything. Nothing is sent for an event type with any other
+location: the whole block is inside
+`if (schedule.location_kind === 'zoom' && !meetUrl)`.
+
+**The repair is merged and not deployed.** `pumasi-booking`
+[`c000feb`](https://github.com/pumasi-ai/pumasi-booking/commit/c000feb) makes
+`service/src/legal.ts` name **Zoom Video Communications, Inc.** under the served
+register's *In use now* heading, with the two fields it receives spelled out;
+`git show 2453adc:service/src/legal.ts | grep -ci zoom` returns **`0`**, so the
+copy now in production never carried it.
+[`SUBPROCESSORS.md`](https://github.com/pumasi-ai/pumasi-booking/blob/main/SUBPROCESSORS.md)
+names Zoom too, since `c4b1159`, and says so about itself in its own text —
+*"the register a customer is actually pointed at omits a provider that this file
+names, and this file is ahead of the published one rather than a record of
+it."* What is missing is not the correction but the deployment: that is
+[`DECISIONS.md` **Q-012**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md),
+*who deploys a merged fix, and by when*, open — the same entry this site names
+on the [Pumasi Sign](/products/pumasi-sign/) card, where four merged repairs are
+stacked behind it — **Q-028** counted the first two, and **Q-035** and **Q-037**
+each call themselves the third and the fourth in their own rows.
+
+**Check this yourself with the right command, because the obvious one lies.**
+`curl -s https://booking.pumasi.ai/subprocessors | grep -ic zoom` returns **4**,
+and not one of the four is a disclosure. Enumerated rather than summarised:
+`.pf-shot-wrap:hover .pf-shot-zoom-hint` and `.pf-shot-zoom-hint` are rules in
+the page's inline stylesheet, `<span class="pf-shot-zoom-hint">` is that class
+on a screenshot caption, and the fourth is `style="cursor:zoom-in;"` on a
+preview image. Four hits, four pieces of presentation.
+`grep -io "zoom video"` is the check, and on 2026-09-01 at **05:20:31 UTC** it
+returned nothing. That trap is written into **Q-036** in its own row because a reading of
+it nearly went the other way.
+
+**What is owed to account holders is not this page's to answer.** The served
+register's own *Adding one* section — present on the page fetched at 05:20:31 UTC,
+in those words — says account holders are *told before an addition takes
+effect*. Whether that clause was owed for a provider that reached
+production undisclosed — and whether publishing the corrected register discharges
+it or a retrospective notice is also due — is open as
+[`DECISIONS.md` **Q-036**](https://github.com/pumasi-ai/pumasi/blob/main/DECISIONS.md)
+and is the steward's. This card reports that entry's state and takes no position
+in it.
 
 ### The ceilings are defaults, not a refusal
 
