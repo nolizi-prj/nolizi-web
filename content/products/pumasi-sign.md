@@ -83,8 +83,12 @@ them — which is what `STAGE.md` §5 asks for by name.
   product-manager role file's ladder at all. Re-read for this card at `pumasi`
   @ `2ab3a4f` on 2026-09-01 and unchanged, down to a top-level `updated` of
   `2026-08-29` — three days stale, across the tick in which this product
-  deployed its front page. The file is not merely stale but **internally
-  inconsistent**:
+  deployed its front page. Re-read again at
+  [`23bbc64`](https://github.com/pumasi-ai/pumasi/commit/23bbc64) later the
+  same day: the only edit since is a `governance.product_rules` pointer to
+  [`PRODUCT-RULES.md`](https://github.com/pumasi-ai/pumasi/blob/main/PRODUCT-RULES.md);
+  every product field and the `updated` stamp are as they were. The file is not
+  merely stale but **internally inconsistent**:
   `products[]` keys both products on `"status"`, while in `items[]`
   `pumasi-sign` uses `"status"` and `pumasi-booking` uses `"maturity"` —
   adjacent entries, same concept, two key names, both reading `seed`. That is
