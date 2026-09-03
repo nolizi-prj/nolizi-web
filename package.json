@@ -1,7 +1,7 @@
 {
-  "name": "pumasi-web",
+  "name": "nolizi-web",
   "version": "0.1.0",
-  "description": "The Pumasi website. Static HTML for people, Markdown and JSON for agents, from one source of content.",
+  "description": "The Nolizi website.",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "dev": "npm run build && npm run serve",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build:test": "rm -rf .build && tsc -p tsconfig.test.json",
-    "test": "npm run build:test && node --test .build/test/*.test.js"
+    "test": "npm run build && node --test test/site.test.js"
   },
   "dependencies": {
     "marked": "^15.0.7"
@@ -24,9 +24,5 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pumasi-ai/pumasi-web.git"
-  },
-  "homepage": "https://pumasi.ai"
+  "homepage": "https://nolizi.com"
 }

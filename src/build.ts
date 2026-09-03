@@ -1,429 +1,86 @@
-/**
- * The build.
- *
- * One pass over the content produces, for every document, both renderings:
- * the HTML a person reads and the Markdown a machine fetches. They are the same
- * `Doc`, so they cannot disagree — which is the whole design of this site.
- *
- * The build is strict. A missing description, a heading anchor that collides, a
- * shortcode that does not exist, an internal link that points nowhere: each one
- * stops the build with the file named. A site that ships broken links is a site
- * whose author found out from a search engine.
- */
-
-import { existsSync } from "node:fs";
-import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { OutputFile } from "./types.js";
 
-import {
-  byDateDesc,
-  byOrderThenTitle,
-  loadContent,
-  loadSiteConfig,
-  markdownPathFor,
-  outputHtmlPath,
-  outputMarkdownPath,
-  urlPathFor,
-} from "./content.js";
-import { renderMarkdown } from "./markdown.js";
-import { renderLayout } from "./render/layout.js";
-import {
-  renderBlogIndex,
-  renderHome,
-  renderPage,
-  renderPost,
-  renderProduct,
-  renderProductIndex,
-} from "./render/pages.js";
-import { renderStyleGuide } from "./render/styleguide.js";
-import { assertNoStrayShortcodes, expandShortcodes } from "./render/shortcodes.js";
-import { faviconSvg } from "./render/art.js";
-import { renderFeed } from "./emit/feed.js";
-import { renderLlmsFull, renderLlmsIndex } from "./emit/llms.js";
-import { renderMachineIndex, renderMarkdownTwin } from "./emit/machine.js";
-import { renderRobots } from "./emit/robots.js";
-import { renderSitemap, sitemapEntriesFor } from "./emit/sitemap.js";
-import * as ld from "./seo/jsonld.js";
-import type { Doc, OutputFile, RenderedDoc, SiteConfig } from "./types.js";
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const OUT = join(ROOT, "site");
+const ASSETS = join(ROOT, "assets");
+const description = "A collection of the software your business runs on — scheduling, signatures, forms, and more — with leading features at a fraction of the usual cost.";
 
-/**
- * The project root, found by walking up to the nearest package.json rather
- * than assuming a fixed depth. The compiled build lands in `dist/` for a real
- * build and in `.build/src/` for the test build; a hard-coded `..` is correct
- * for exactly one of those.
- */
-function findRoot(from: string): string {
-  let dir = from;
-  for (let i = 0; i < 8; i += 1) {
-    if (existsSync(join(dir, "package.json"))) return dir;
-    const parent = dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
-  }
-  throw new Error(`could not find a package.json above ${from}`);
+function page(): string {
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nolizi — Collection of Knowledge</title>
+  <meta name="description" content="${description}"><meta name="theme-color" content="#fdfdfb">
+  <link rel="canonical" href="https://nolizi.com/">
+  <meta property="og:title" content="Nolizi — Collection of Knowledge"><meta property="og:description" content="${description}"><meta property="og:type" content="website"><meta property="og:url" content="https://nolizi.com/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a><div class="mandala" aria-hidden="true"></div>
+  <div class="site-shell">
+    <nav class="nav wrap" aria-label="Primary">
+      <a class="brand" href="/" aria-label="Nolizi home"><img src="/logo.svg" width="120" height="30" alt="Nolizi"></a>
+      <div class="nav-links"><a href="#products">Products</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></div>
+      <a class="button button-ink nav-cta" href="#cta">Get started</a>
+    </nav>
+    <main id="main">
+      <header class="hero wrap">
+        <h1>Collection of <em>Knowledge</em>,<br>Built by Nolizi</h1>
+        <p class="hero-copy">${description}</p>
+        <div class="actions"><a class="button" href="#cta">Get started</a><a class="text-link" href="#products">Explore the collection <span aria-hidden="true">→</span></a></div>
+      </header>
+      <section class="section wash" id="products"><div class="wrap">
+        <p class="eyebrow">The collection</p><h2>One subscription. The tools you already pay six vendors for.</h2>
+        <p class="section-copy">We focus on network-based growth products — the everyday software teams share with people outside their walls.</p>
+        <div class="cards">
+          <article class="card"><span class="glyph">SC</span><h3>Nolizi Schedule</h3><p>Share a link, get booked. Calendar scheduling without the back-and-forth.</p></article>
+          <article class="card"><span class="glyph">SG</span><h3>Nolizi Sign</h3><p>Legally binding e-signatures with a clean audit trail, sent in seconds.</p></article>
+          <article class="card"><span class="glyph">FM</span><h3>Nolizi Forms</h3><p>Forms and intake flows that route answers where your team works.</p></article>
+          <article class="card"><span class="glyph">DC</span><h3>Nolizi Docs</h3><p>Shareable documents and proposals that track who read what, when.</p></article>
+        </div>
+      </div></section>
+      <section class="section wrap" id="how">
+        <p class="eyebrow">How it works</p><h2>Leading software, rebuilt the fast way.</h2>
+        <div class="steps">
+          <article class="step"><span>01</span><h3>Start from open source</h3><p>We build on proven open foundations instead of reinventing them, inspired by the best software in each category.</p></article>
+          <article class="step"><span>02</span><h3>Accelerate with AI</h3><p>AI-assisted development lets a small team ship in weeks what used to take years.</p></article>
+          <article class="step"><span>03</span><h3>Pass the savings on</h3><p>Lower build cost becomes lower price. The whole collection for less than one incumbent seat.</p></article>
+        </div>
+      </section>
+      <section class="section wash" id="pricing"><div class="wrap pricing-grid">
+        <div><p class="eyebrow">Pricing</p><h2>Low cost, by design.</h2><p class="section-copy">Open foundations and AI-speed development mean we don’t carry the cost structure of the incumbents — and neither do you. One plan, every tool in the collection.</p></div>
+        <article class="price-card"><p class="price-name">Everything plan</p><p class="price"><strong>$12</strong><span>/ user / month</span></p><ul><li>Every product in the collection</li><li>Unlimited external recipients</li><li>New tools added as we ship them</li></ul><a class="button button-ink" href="#cta">Start free</a></article>
+      </div></section>
+      <section class="cta wrap" id="cta"><p class="eyebrow">Begin here</p><h2>Start with one tool.<br>Keep the whole field.</h2><p>Try any product in the collection free — no card, no call.</p><a class="button" href="mailto:hello@nolizi.com?subject=Get%20started%20with%20Nolizi">Get started</a></section>
+    </main>
+    <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="/"><img src="/logo.svg" width="112" height="28" alt="Nolizi"></a><nav aria-label="Footer"><a href="#products">Products</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></nav><p>© 2026 Nolizi. Center of Knowledge Field.</p></div></footer>
+  </div>
+</body></html>`;
 }
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const ROOT = findRoot(HERE);
-const CONTENT = join(ROOT, "content");
-const ASSETS = join(ROOT, "assets");
-const OUT = join(ROOT, "site");
-
-/** The build date, fixed once so every artefact in one build agrees. */
-function today(): string {
-  const override = process.env.PUMASI_BUILD_DATE;
-  if (override) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(override)) {
-      throw new Error(`PUMASI_BUILD_DATE must be YYYY-MM-DD, got "${override}"`);
-    }
-    return override;
-  }
-  return new Date().toISOString().slice(0, 10);
+function notFound(): string {
+  return page().replace('<main id="main">', '<main id="main"><section class="cta wrap"><p class="eyebrow">404</p><h1>Nothing planted here.</h1><p><a href="/">Return to Nolizi</a></p></section><div hidden>').replace('</main>', '</div></main>').replace('<meta name="description"', '<meta name="robots" content="noindex"><meta name="description"');
 }
 
 export async function build(outDir = OUT): Promise<OutputFile[]> {
-  const site = await loadSiteConfig(CONTENT);
-  const docs = await loadContent(CONTENT);
-  const date = today();
-
-  const rendered = docs.map((doc) => renderDoc(doc));
-  const rendering = new Map(rendered.map((doc) => [doc.slug, doc]));
-
-  const pages = rendered
-    .filter((d) => d.kind === "page" && d.slug !== "")
-    .sort(byOrderThenTitle);
-  const products = rendered.filter((d) => d.kind === "product").sort(byOrderThenTitle);
-  const posts = rendered.filter((d) => d.kind === "post").sort(byDateDesc);
-  const home = rendering.get("");
-  if (!home) throw new Error("content/pages/index.md is required — it is the home page");
-
-  const files: OutputFile[] = [];
-
-  // `products` and `blog` are section intros: their prose is rendered inside
-  // the generated index below, so they get a Markdown twin but no page of
-  // their own. Emitting both would put the same text at one URL twice.
-  const SECTION_INTROS = new Set(["products", "blog"]);
-
-  for (const doc of rendered) {
-    if (!SECTION_INTROS.has(doc.slug)) {
-      files.push({ path: outputHtmlPath(doc.slug), contents: htmlFor(site, doc, products, posts) });
-    }
-    files.push({ path: outputMarkdownPath(doc.slug), contents: renderMarkdownTwin(site, doc) });
-  }
-
-  // Section indexes. Their intros are optional pages; when one exists it is
-  // rendered inside the index rather than at its own URL.
-  const productIntro = rendering.get("products") ?? null;
-  const blogIntro = rendering.get("blog") ?? null;
-
-  files.push({
-    path: "products/index.html",
-    contents: renderLayout({
-      site,
-      title: productIntro?.matter.title ?? "Products",
-      description:
-        productIntro?.matter.description ??
-        "Every product the Pumasi commons has built, and what each one cannot do yet.",
-      urlPath: "/products/",
-      markdownPath: productIntro ? markdownPathFor("products") : undefined,
-      jsonLd: [
-        ld.organisation(site),
-        ld.breadcrumbs(site, [
-          { name: "Home", path: "/" },
-          { name: "Products", path: "/products/" },
-        ]),
-        {
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          url: `${site.url}/products/`,
-          name: "Products",
-          hasPart: products.map((p) => ({
-            "@type": "SoftwareApplication",
-            name: p.matter.title,
-            url: `${site.url}${p.urlPath}`,
-            applicationCategory: "BusinessApplication",
-            isAccessibleForFree: true,
-          })),
-        },
-      ],
-      main: renderProductIndex(productIntro, products),
-    }),
-  });
-
-  files.push({
-    path: "blog/index.html",
-    contents: renderLayout({
-      site,
-      title: blogIntro?.matter.title ?? "Writing",
-      description:
-        blogIntro?.matter.description ??
-        "Updates from the commons, and what the market currently charges for the software it is rebuilding.",
-      urlPath: "/blog/",
-      markdownPath: blogIntro ? markdownPathFor("blog") : undefined,
-      jsonLd: [
-        ld.organisation(site),
-        ld.blog(site, posts.map((p) => ({ doc: p, urlPath: p.urlPath }))),
-        ld.breadcrumbs(site, [
-          { name: "Home", path: "/" },
-          { name: "Writing", path: "/blog/" },
-        ]),
-      ],
-      main: renderBlogIndex(blogIntro, posts),
-    }),
-  });
-
-  // Machine-readable surfaces.
-  const sitemapDocs = [
-    ...rendered.filter((d) => d.slug !== "products" && d.slug !== "blog"),
+  const files: OutputFile[] = [
+    { path: "index.html", contents: page() }, { path: "404.html", contents: notFound() },
+    { path: "robots.txt", contents: "User-agent: *\nAllow: /\nSitemap: https://nolizi.com/sitemap.xml\n" },
+    { path: "sitemap.xml", contents: '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://nolizi.com/</loc></url></urlset>\n' },
   ];
-  const sitemapEntries = [
-    ...sitemapEntriesFor(sitemapDocs, date),
-    { urlPath: "/products/", lastmod: date, changefreq: "weekly" as const, priority: "0.9" },
-    { urlPath: "/blog/", lastmod: date, changefreq: "weekly" as const, priority: "0.8" },
-  ].sort((a, b) => a.urlPath.localeCompare(b.urlPath));
-
-  files.push({ path: "sitemap.xml", contents: renderSitemap(site, sitemapEntries) });
-  files.push({ path: "robots.txt", contents: renderRobots(site) });
-  files.push({
-    path: "feed.xml",
-    contents: renderFeed(site, posts, posts[0]?.matter.updated ?? posts[0]?.matter.date ?? date),
-  });
-  files.push({
-    path: "llms.txt",
-    contents: renderLlmsIndex(site, { pages, products, posts }, date),
-  });
-  files.push({
-    path: "llms-full.txt",
-    contents: renderLlmsFull(site, [home, ...pages, ...products, ...posts], date),
-  });
-  files.push({ path: "index.json", contents: renderMachineIndex(site, rendered, date) });
-  files.push({ path: "favicon.svg", contents: faviconSvg() });
-  files.push({ path: "404.html", contents: notFoundPage(site) });
-
-  // Assets are copied rather than generated, so the link checker is told
-  // about them explicitly instead of inferring a whole directory.
-  const assetPaths = (await readdir(ASSETS, { recursive: true, withFileTypes: true }))
-    .filter((entry) => entry.isFile())
-    .map((entry) => `/${relative(ASSETS, join(entry.parentPath, entry.name))}`);
-
-  checkInternalLinks(files, assetPaths, site);
-
-  await writeAll(outDir, files);
-  await cp(ASSETS, outDir, { recursive: true });
-
+  await rm(outDir, { recursive: true, force: true }); await mkdir(outDir, { recursive: true });
+  for (const file of files) await writeFile(join(outDir, file.path), file.contents, "utf8");
+  for (const asset of ["styles.css", "logo.svg", "favicon.svg", "mandala.gif", "mandala-static.svg"]) {
+    await copyFile(join(ASSETS, asset), join(outDir, asset));
+  }
   return files;
 }
 
-function renderDoc(doc: Doc): RenderedDoc {
-  const { html, headings, text } = renderMarkdown(doc.body);
-  const context = doc.source;
-  const expanded = expandShortcodes(html, context);
-  assertNoStrayShortcodes(expanded, context);
-
-  return {
-    ...doc,
-    urlPath: urlPathFor(doc.slug),
-    markdownPath: markdownPathFor(doc.slug),
-    html: expanded,
-    headings,
-    text,
-  };
-}
-
-function htmlFor(
-  site: SiteConfig,
-  doc: RenderedDoc,
-  products: RenderedDoc[],
-  posts: RenderedDoc[],
-): string {
-  const words = doc.text.split(/\s+/).filter(Boolean).length;
-
-  if (doc.slug === "") {
-    return renderLayout({
-      site,
-      title: doc.matter.title,
-      description: doc.matter.description,
-      urlPath: "/",
-      markdownPath: doc.markdownPath,
-      jsonLd: [ld.organisation(site), ld.website(site)],
-      main: renderHome(doc, products, posts),
-      bodyClass: "home",
-    });
-  }
-
-  if (doc.kind === "product") {
-    return renderLayout({
-      site,
-      title: doc.matter.title,
-      description: doc.matter.description,
-      urlPath: doc.urlPath,
-      markdownPath: doc.markdownPath,
-      updatedAt: doc.matter.updated,
-      jsonLd: [
-        ld.organisation(site),
-        ld.softwareApplication(site, doc, doc.urlPath),
-        ld.breadcrumbs(site, [
-          { name: "Home", path: "/" },
-          { name: "Products", path: "/products/" },
-          { name: doc.matter.title, path: doc.urlPath },
-        ]),
-      ],
-      main: renderProduct(doc),
-    });
-  }
-
-  if (doc.kind === "post") {
-    return renderLayout({
-      site,
-      title: doc.matter.title,
-      description: doc.matter.description,
-      urlPath: doc.urlPath,
-      markdownPath: doc.markdownPath,
-      ogType: "article",
-      publishedAt: doc.matter.date,
-      updatedAt: doc.matter.updated,
-      author: doc.matter.author ?? site.org.name,
-      tags: doc.matter.tags,
-      jsonLd: [
-        ld.organisation(site),
-        ld.blogPosting(site, doc, doc.urlPath, words),
-        ld.breadcrumbs(site, [
-          { name: "Home", path: "/" },
-          { name: "Writing", path: "/blog/" },
-          { name: doc.matter.title, path: doc.urlPath },
-        ]),
-      ],
-      main: renderPost(doc, site),
-    });
-  }
-
-  // The style guide is generated from the theme so it cannot drift from it.
-  const body = doc.slug === "design" ? doc.html + renderStyleGuide() : doc.html;
-
-  return renderLayout({
-    site,
-    title: doc.matter.title,
-    description: doc.matter.description,
-    urlPath: doc.urlPath,
-    markdownPath: doc.markdownPath,
-    updatedAt: doc.matter.updated,
-    jsonLd: [
-      ld.organisation(site),
-      ld.webPage(site, doc, doc.urlPath),
-      ld.breadcrumbs(site, [
-        { name: "Home", path: "/" },
-        { name: doc.matter.title, path: doc.urlPath },
-      ]),
-    ],
-    main: renderPage({ ...doc, html: body }),
-  });
-}
-
-function notFoundPage(site: SiteConfig): string {
-  return renderLayout({
-    site,
-    title: "Not here",
-    description: "That page does not exist on this site.",
-    urlPath: "/404.html",
-    noindex: true,
-    main: `      <div class="prose wrap">
-        <header class="page-head">
-          <h1>Not here</h1>
-          <p class="lede">
-            That address does not exist on this site. Nothing was logged, because
-            this site logs nothing.
-          </p>
-        </header>
-        <p>
-          If you arrived from somewhere that promised otherwise, the index is at
-          <a href="/">the home page</a>, and the complete list of every URL here
-          is <a href="/sitemap.xml">/sitemap.xml</a>.
-        </p>
-        <p>
-          If you are a machine: <a href="/llms.txt">/llms.txt</a> lists every
-          page with its Markdown twin, and <a href="/index.json">/index.json</a>
-          is the same thing typed.
-        </p>
-      </div>`,
-  });
-}
-
-/**
- * Internal links must resolve to something this build emitted.
- *
- * Cheap to run, and it catches the failure mode that hurts a small site most:
- * a renamed page leaves a dead link that nobody clicks for six months while a
- * search engine quietly downgrades the page pointing at it.
- */
-function checkInternalLinks(
-  files: OutputFile[],
-  assetPaths: string[],
-  site: SiteConfig,
-): void {
-  const emitted = new Set([...files.map((f) => `/${f.path}`), ...assetPaths]);
-  for (const file of files) {
-    if (file.path.endsWith("/index.html")) emitted.add(`/${file.path.replace(/index\.html$/, "")}`);
-  }
-  emitted.add("/");
-
-  const problems: string[] = [];
-  for (const file of files) {
-    if (!file.path.endsWith(".html")) continue;
-    for (const match of file.contents.matchAll(/href="(\/[^"#?]*)"/g)) {
-      const href = match[1] as string;
-      if (href.startsWith("//")) continue;
-      if (emitted.has(href)) continue;
-      if (emitted.has(href.endsWith("/") ? href : `${href}/`)) continue;
-      problems.push(`${file.path} → ${href}`);
-    }
-  }
-
-  if (problems.length) {
-    throw new Error(
-      `${problems.length} internal link(s) point at nothing this build emitted:\n  ` +
-        `${problems.join("\n  ")}\n\n` +
-        `Every href must resolve to a generated file. Site root is ${site.url}.`,
-    );
-  }
-}
-
-async function writeAll(outDir: string, files: OutputFile[]): Promise<void> {
-  await rm(outDir, { recursive: true, force: true });
-  for (const file of files) {
-    const target = join(outDir, file.path);
-    await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, file.contents, "utf8");
-  }
-}
-
-/** Only run when executed directly, so tests can import `build`. */
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
-  const started = Date.now();
-  const files = await build();
-  const bytes = files.reduce((sum, f) => sum + Buffer.byteLength(f.contents), 0);
-  const kinds = new Map<string, number>();
-  for (const file of files) {
-    const ext = file.path.slice(file.path.lastIndexOf(".")) || "(none)";
-    kinds.set(ext, (kinds.get(ext) ?? 0) + 1);
-  }
-  const summary = [...kinds.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([ext, n]) => `${n}${ext}`)
-    .join("  ");
-
-  process.stdout.write(
-    `built ${files.length} files (${summary}) — ${(bytes / 1024).toFixed(0)} kB — in ${Date.now() - started} ms\n` +
-      `→ ${OUT}\n`,
-  );
-  // A quiet reassurance that the two audiences really did both get served.
-  const md = files.filter((f) => f.path.endsWith(".md")).length;
-  const html = files.filter((f) => f.path.endsWith(".html")).length;
-  process.stdout.write(`  ${html} HTML pages, ${md} Markdown twins, ${await readSize()} of CSS\n`);
-}
-
-async function readSize(): Promise<string> {
-  const base = await readFile(join(ASSETS, "base.css"), "utf8");
-  const theme = await readFile(join(ASSETS, "theme.css"), "utf8");
-  return `${((base.length + theme.length) / 1024).toFixed(0)} kB`;
+  const files = await build(); const css = await readFile(join(ASSETS, "styles.css"), "utf8");
+  process.stdout.write(`built Nolizi — ${files.length} documents, ${(css.length / 1024).toFixed(1)} kB CSS → ${OUT}\n`);
 }
