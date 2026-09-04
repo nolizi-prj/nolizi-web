@@ -18,8 +18,10 @@ const products = [
 
 function productCards(): string {
   return products.map(([slug, name, copy]) => `<article class="product-card">
-          <img class="product-mark" src="/logos/nolizi-${slug}.svg" width="96" height="70" alt="">
-          <h2>${name}</h2>
+          ${slug === "calendar"
+            ? '<span class="product-mark live-calendar" aria-hidden="true"><i></i><i></i><i></i><span><small data-calendar-month>SEP</small><b data-calendar-day>04</b></span></span>'
+            : `<img class="product-mark" src="/logos/nolizi-${slug}.svg" width="96" height="70" alt="">`}
+          <h2>${name}${slug === "forms" ? '<span class="status">Coming soon</span>' : ""}</h2>
           <p>${copy}</p>
         </article>`).join("\n        ");
 }
@@ -40,6 +42,7 @@ function page(): string {
   <meta property="og:url" content="https://nolizi.com/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
+  <script>document.addEventListener("DOMContentLoaded",()=>{const d=new Date();document.querySelector("[data-calendar-month]").textContent=d.toLocaleString("en",{month:"short"}).toUpperCase();document.querySelector("[data-calendar-day]").textContent=String(d.getDate()).padStart(2,"0")})</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
